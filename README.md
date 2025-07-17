@@ -13,7 +13,7 @@ The main functionalities of this application include:
 
 ## Usage
 
-The jar can be downloaded from the [releases page](https://github.com/yourusername/create_teams/releases).
+The jar can be downloaded from the [releases page](https://github.com/raul-izquierdo/create_teams/releases).
 
 ```bash
 java -jar create_teams.jar <csv_file> -o <organization> -t <token>
