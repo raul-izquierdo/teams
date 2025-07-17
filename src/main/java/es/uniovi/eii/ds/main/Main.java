@@ -43,7 +43,7 @@ public class Main {
         else {
             System.out.println();
             for (Student student : result.addedStudents())
-                System.out.println("   " + student.identifier() + " -> " + student.githubUsername());
+                System.out.println("   " + student.identifier());
         }
         System.out.println("- Already in team: " + result.alreadyInTeam().size());
         System.out.println("- Missing GitHub usernames: " + result.missingUsername().size());
