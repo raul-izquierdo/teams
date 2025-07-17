@@ -5,17 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>es.uniovi.eii.ds</groupId>
-    <artifactId>create_teams</artifactId>
+    <artifactId>${project.name}</artifactId>
     <version>1.0</version>
 
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.name>create_teams</project.name>
     </properties>
 
 
     <build>
-        <finalName>create_teams</finalName>
+        <finalName>${project.name}</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -34,7 +35,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.6.0</version>
                 <configuration>
-                    <finalName>create_teams</finalName>
+                    <finalName>${project.name}</finalName>
                     <archive>
                         <manifest>
                             <mainClass>es.uniovi.eii.ds.main.Main</mainClass>
