@@ -1,11 +1,19 @@
 package es.uniovi.eii.ds.github;
 
+import static es.uniovi.eii.ds.cli.CommandLine.*;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.*;
 import java.util.*;
 
 public class GithubApi {
+    public enum ApiResult {
+        OK,
+        ALREADY_EXISTS,
+        REJECTED
+    }
+
     private final String token;
     private final String organization;
     private final HttpClient client;
@@ -42,10 +50,8 @@ public class GithubApi {
         return teams;
     }
 
-    public boolean createTeam(String teamName) throws IOException, InterruptedException {
-
+    public ApiResult createTeam(String teamName) throws IOException, InterruptedException {
         String json = String.format("{\"name\":\"%s\",\"privacy\":\"closed\"}", teamName);
-
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.github.com/orgs/" + organization + "/teams"))
                 .header("Authorization", "Bearer " + token)
@@ -53,25 +59,34 @@ public class GithubApi {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
-
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        return response.statusCode() == 201 || response.statusCode() == 422;
+
+        if (response.statusCode() == 201)
+            return ApiResult.OK;
+        if (response.statusCode() == 422)
+            return ApiResult.ALREADY_EXISTS;
+        printError("Failed to create team '" + teamName + "'. Status: " + response.statusCode()
+                + ". Response: " + response.body());
+        return ApiResult.REJECTED;
     }
 
-    public boolean addStudentToTeam(String teamName, String username) throws IOException, InterruptedException {
-
+    public ApiResult addStudentToTeam(String teamName, String username) throws IOException, InterruptedException {
         String url = String.format("https://api.github.com/orgs/%s/teams/%s/memberships/%s", organization,
                 teamName.toLowerCase(), username);
-
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Authorization", "Bearer " + token)
                 .header("Accept", "application/vnd.github+json")
                 .PUT(HttpRequest.BodyPublishers.noBody())
                 .build();
-
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return response.statusCode() == 200 || response.statusCode() == 201;
+        if (response.statusCode() == 201)
+            return ApiResult.OK;
+        if (response.statusCode() == 200)
+            return ApiResult.ALREADY_EXISTS;
+        printError("Failed to add user '" + username + "' to team '" + teamName + "'. Status: "
+                + response.statusCode() + ". Response: " + response.body());
+        return ApiResult.REJECTED;
     }
 }

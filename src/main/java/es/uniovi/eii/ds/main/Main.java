@@ -40,6 +40,7 @@ public class Main {
 
         int alreadyInTeam = 0;
         int missingUsername = 0;
+        int rejected = 0;
         try {
             Set<String> existingTeams = github.getExistingTeams();
 
@@ -47,8 +48,14 @@ public class Main {
                 String teamName = team.getName();
                 if (existingTeams.contains(teamName))
                     alreadyCreatedTeams.add(teamName);
-                else if (github.createTeam(teamName))
-                    createdTeams.add(teamName);
+                else {
+                    var result = github.createTeam(teamName);
+                    if (result == GithubApi.ApiResult.OK)
+                        createdTeams.add(teamName);
+                    else if (result == GithubApi.ApiResult.ALREADY_EXISTS)
+                        alreadyCreatedTeams.add(teamName);
+                    // else REJECTED: already logged
+                }
             }
 
             for (Team team : teams) {
@@ -58,18 +65,21 @@ public class Main {
                         continue;
                     }
 
-                    boolean added = github.addStudentToTeam(team.getName(), student.getGithubUsername());
-                    if (added)
+                    var result = github.addStudentToTeam(team.getName(), student.getGithubUsername());
+                    if (result == GithubApi.ApiResult.OK)
                         addedStudents.add(student.getIdentifier() + " -> " + team.getName());
-                    else
+                    else if (result == GithubApi.ApiResult.ALREADY_EXISTS)
                         alreadyInTeam++;
+                    else if (result == GithubApi.ApiResult.REJECTED)
+                        rejected++;
                 }
             }
         } catch (Exception e) {
             System.err.println("Error with GitHub API: " + e.getMessage());
             return null;
         }
-        return new GitHubResult(createdTeams, alreadyCreatedTeams, addedStudents, alreadyInTeam, missingUsername);
+        return new GitHubResult(createdTeams, alreadyCreatedTeams, addedStudents, alreadyInTeam, missingUsername,
+                rejected);
     }
 
     private static record GitHubResult(
@@ -77,7 +87,8 @@ public class Main {
             Set<String> alreadyCreatedTeams,
             List<String> addedStudents,
             int alreadyInTeam,
-            int missingUsername) {
+            int missingUsername,
+            int rejected) {
     }
 
     private static void printSummary(GitHubResult result) {
@@ -85,24 +96,21 @@ public class Main {
                 ## Groups
                 - Created teams: %s
                 - Already created teams: %s
-
                 """.formatted(
                 String.join(", ", result.createdTeams),
                 String.join(", ", result.alreadyCreatedTeams)));
 
-        System.out.println("""
-                ## Students
-                - Added students:
-                """);
-        for (String s : result.addedStudents)
-            System.out.println("   " + s);
+        System.out.println("## Students\n- Added students:");
+        for (String student : result.addedStudents)
+            System.out.println("   " + student);
 
         System.out.println("""
 
                 - Skipped students:
                    Already in team: %d
                    Missing GitHub username: %d
-                """.formatted(result.alreadyInTeam, result.missingUsername));
+                   API rejected: %d
+                """.formatted(result.alreadyInTeam, result.missingUsername, result.rejected));
     }
 
 }
