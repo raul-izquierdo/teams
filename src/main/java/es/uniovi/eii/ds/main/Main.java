@@ -1,12 +1,14 @@
 package es.uniovi.eii.ds.main;
 
-import es.uniovi.eii.ds.csv.ModelLoader;
-import es.uniovi.eii.ds.github.GithubApi;
-import es.uniovi.eii.ds.model.Team;
-
 import static es.uniovi.eii.ds.cli.CommandLine.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import es.uniovi.eii.ds.csv.ModelLoader;
+import es.uniovi.eii.ds.github.Organization;
+import es.uniovi.eii.ds.github.Organization.ProcessResult;
+import es.uniovi.eii.ds.model.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -24,93 +26,50 @@ public class Main {
         if (teams.isEmpty())
             return;
 
-        GitHubResult result = createGroups(token, organization, teams);
-        if (result == null)
-            return;
+        var result = Organization.updateOrganization(token, organization, teams);
 
         printSummary(result);
     }
 
-    private static GitHubResult createGroups(String token, String org, List<Team> teams) {
-        GithubApi github = new GithubApi(token, org);
+    private static void printSummary(ProcessResult result) {
+        System.out.println("\n## Groups");
+        System.out.println("- Created teams: " + teamNames(result.createdTeams()));
+        System.out.println("- Already created teams: " + teamNames(result.alreadyCreatedTeams()));
+        System.out.println("- Team creations rejected: " + teamNames(result.rejectedTeams()));
 
-        Set<String> createdTeams = new HashSet<>();
-        Set<String> alreadyCreatedTeams = new HashSet<>();
-        List<String> addedStudents = new ArrayList<>();
-
-        int alreadyInTeam = 0;
-        int missingUsername = 0;
-        int rejected = 0;
-        try {
-            Set<String> existingTeams = github.getExistingTeams();
-
-            for (Team team : teams) {
-                String teamName = team.getName();
-                if (existingTeams.contains(teamName))
-                    alreadyCreatedTeams.add(teamName);
-                else {
-                    var result = github.createTeam(teamName);
-                    if (result == GithubApi.ApiResult.OK)
-                        createdTeams.add(teamName);
-                    else if (result == GithubApi.ApiResult.ALREADY_EXISTS)
-                        alreadyCreatedTeams.add(teamName);
-                    // else REJECTED: already logged
-                }
-            }
-
-            for (Team team : teams) {
-                for (var student : team.getStudents()) {
-                    if (!student.hasGithubUsername()) {
-                        missingUsername++;
-                        continue;
-                    }
-
-                    var result = github.addStudentToTeam(team.getName(), student.getGithubUsername());
-                    if (result == GithubApi.ApiResult.OK)
-                        addedStudents.add(student.getIdentifier() + " -> " + team.getName());
-                    else if (result == GithubApi.ApiResult.ALREADY_EXISTS)
-                        alreadyInTeam++;
-                    else if (result == GithubApi.ApiResult.REJECTED)
-                        rejected++;
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error with GitHub API: " + e.getMessage());
-            return null;
+        System.out.print("\n## Students\n- Added students: ");
+        if (result.addedStudents().isEmpty())
+            System.out.println("0");
+        else {
+            System.out.println();
+            for (Student student : result.addedStudents())
+                System.out.println("   " + student.identifier() + " -> " + student.githubUsername());
         }
-        return new GitHubResult(createdTeams, alreadyCreatedTeams, addedStudents, alreadyInTeam, missingUsername,
-                rejected);
+        System.out.println("- Already in team: " + result.alreadyInTeam().size());
+        System.out.println("- Missing GitHub usernames: " + result.missingUsername().size());
+        System.out.print("- Student additions rejected: ");
+        if (result.rejectedStudents().isEmpty())
+            System.out.println("0");
+        else {
+            System.out.println();
+            for (Student student : result.rejectedStudents())
+                System.out.println("      " + student.identifier() + ", " + student.githubUsername());
+        }
     }
 
-    private static record GitHubResult(
-            Set<String> createdTeams,
-            Set<String> alreadyCreatedTeams,
-            List<String> addedStudents,
-            int alreadyInTeam,
-            int missingUsername,
-            int rejected) {
+    private static String teamNames(List<Team> teams) {
+        return textOrZero(joinTeamNames(teams));
     }
 
-    private static void printSummary(GitHubResult result) {
-        System.out.println("""
-                ## Groups
-                - Created teams: %s
-                - Already created teams: %s
-                """.formatted(
-                String.join(", ", result.createdTeams),
-                String.join(", ", result.alreadyCreatedTeams)));
+    private static String joinTeamNames(List<Team> teams) {
+        return teams.stream()
+                .map(Team::getName)
+                .sorted()
+                .collect(Collectors.joining(", "));
+    }
 
-        System.out.println("## Students\n- Added students:");
-        for (String student : result.addedStudents)
-            System.out.println("   " + student);
-
-        System.out.println("""
-
-                - Skipped students:
-                   Already in team: %d
-                   Missing GitHub username: %d
-                   API rejected: %d
-                """.formatted(result.alreadyInTeam, result.missingUsername, result.rejected));
+    private static String textOrZero(String text) {
+        return text == null || text.isEmpty() ? "0" : text;
     }
 
 }
