@@ -20,7 +20,7 @@ public class Main {
         }
 
         String token = cliArguments.get("-t");
-        String organization = cliArguments.getOrDefault("-o", "eii");
+        String organization = cliArguments.get("-o");
         String csvFile = cliArguments.get("csv");
         List<Team> teams = ModelLoader.loadModel(csvFile);
         if (teams.isEmpty())

@@ -41,7 +41,12 @@ public class CommandLine {
             return false;
 
         if (!args.containsKey("csv")) {
-            printError("CSV file is required.");
+            printError("CSV file is required. Download the roster from your Github Classroom.");
+            return false;
+        }
+
+        if (!args.containsKey("-o")) {
+            printError("GitHub organization name is required. Use -o <organization>.");
             return false;
         }
 
@@ -67,16 +72,20 @@ public class CommandLine {
                         Usage: java -jar create_teams.jar <csvfile> -t <token> [-o <organization>]
 
                         Options:
-                          <csvfile>            CSV file with student data. This must be the roster downloaded from your classroom platform (required)
-                          -t <token>           GitHub API access token. If not provided, it will try to read from the GITHUB_TOKEN environment variable or from an .env file.
-                          -o <organization>    GitHub organization name (default: eii)
-                          -h, --help           Show this help message
+                          <csvfile>            CSV file with student data. This must be the roster
+                                               downloaded from your classroom platform (required).
+                          -t <token>           GitHub API access token. If not provided, it will try to
+                                               read from the GITHUB_TOKEN environment variable or from
+                                               an .env file.
+                          -o <organization>    GitHub organization name.
+                          -h, --help           Show this help message.
 
-                        This program creates GitHub teams and adds students to them based on the CSV file generated from the classroom roster.
-                        The students ids in the roster should follow the format "<group_id>-<name>" (01-John Doe).
+                        This program creates GitHub teams and adds students to them based on the CSV
+                        file generated from the classroom roster. The students ids in the roster should
+                        follow the format "<group_id>-<name>" (01-John Doe).
 
-                        If a team or student already exists, it is ignored.
-                        Students without GitHub username or id are skipped.
+                        If a team or student already exists, it is ignored. Students without GitHub
+                        username or id are skipped.
                         """);
     }
 }
