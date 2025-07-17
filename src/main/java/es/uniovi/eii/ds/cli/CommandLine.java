@@ -22,15 +22,11 @@ public class CommandLine {
             i++;
         }
 
-        // The API token could be set from an environment variable or .env file if not provided
-        if (!map.containsKey("-t")) {
-            Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
-            String token = dotenv.get("GITHUB_TOKEN");
-            if (token == null)
-                token = System.getenv("GITHUB_TOKEN");
-            if (token != null)
-                map.put("-t", token);
-        }
+        addEnvironmentIfAbsent(map, "-t", "GITHUB_TOKEN");
+        addEnvironmentIfAbsent(map, "-o", "GITHUB_ORG");
+
+        if (!map.containsKey("csv"))
+            map.put("csv", "classroom_roster.csv");
 
         return map;
     }
@@ -69,15 +65,17 @@ public class CommandLine {
     public static void printHelp() {
         System.out.println(
                 """
-                        Usage: java -jar create_teams.jar <csvfile> -t <token> [-o <organization>]
+                        Usage: java -jar create_teams.jar [<csvfile>] [-t <token>] [-o <organization>]
 
                         Options:
-                          <csvfile>            CSV file with student data. This must be the roster
-                                               downloaded from your classroom platform (required).
+                          <csvfile>            The roster CSV file downloaded from the classroom
+                                               (default = "classroom_roster.csv").
                           -t <token>           GitHub API access token. If not provided, it will try to
                                                read from the GITHUB_TOKEN environment variable or from
                                                an .env file.
-                          -o <organization>    GitHub organization name.
+                          -o <organization>    GitHub organization name. If not provided, it will try to
+                                               read from the GITHUB_ORG environment variable or from
+                                               an .env file.
                           -h, --help           Show this help message.
 
                         This program creates GitHub teams and adds students to them based on the CSV
@@ -87,5 +85,18 @@ public class CommandLine {
                         If a team or student already exists, it is ignored. Students without GitHub
                         username or id are skipped.
                         """);
+    }
+
+    private static void addEnvironmentIfAbsent(Map<String, String> map, String key, String envKey) {
+        if (!map.containsKey(key))
+            getEnvOrDotenv(envKey).ifPresent(value -> map.put(key, value));
+    }
+
+    private static java.util.Optional<String> getEnvOrDotenv(String key) {
+        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+        String value = dotenv.get(key);
+        if (value == null)
+            value = System.getenv(key);
+        return java.util.Optional.ofNullable(value);
     }
 }

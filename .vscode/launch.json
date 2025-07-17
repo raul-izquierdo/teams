@@ -9,7 +9,6 @@
             "name": "Main",
             "request": "launch",
             "mainClass": "es.uniovi.eii.ds.main.Main",
-            "args": "test_classroom_roster.csv -o RaulsOrganization",
         }
     ]
 }
