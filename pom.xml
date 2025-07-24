@@ -4,14 +4,14 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>es.uniovi.eii.ds</groupId>
+    <groupId>es.uniovi.raul</groupId>
     <artifactId>${project.name}</artifactId>
     <version>1.0</version>
 
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.name>create_teams</project.name>
+        <project.name>teams</project.name>
     </properties>
 
 
@@ -27,7 +27,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
-                    <mainClass>es.uniovi.eii.ds.main.Main</mainClass>
+                    <mainClass>es.uniovi.raul.teams.main.Main</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -38,7 +38,7 @@
                     <finalName>${project.name}</finalName>
                     <archive>
                         <manifest>
-                            <mainClass>es.uniovi.eii.ds.main.Main</mainClass>
+                            <mainClass>es.uniovi.raul.teams.main.Main</mainClass>
                         </manifest>
                     </archive>
                     <appendAssemblyId>false</appendAssemblyId>
@@ -56,6 +56,33 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <configLocation>checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
@@ -69,5 +96,27 @@
             <artifactId>dotenv-java</artifactId>
             <version>3.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <developers>
+        <developer>
+            <id>ric</id>
+            <name>Raúl Izquierdo Castanedo</name>
+            <email>raul.izquierdo@gmail.com</email>
+            <url>https://github.com/raul-izquierdo</url>
+            <organization>University of Oviedo</organization>
+            <organizationUrl>https://www.uniovi.es</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>designer</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
 </project>

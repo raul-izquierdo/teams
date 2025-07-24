@@ -1,4 +1,6 @@
-package es.uniovi.eii.ds.csv;
+package es.uniovi.raul.teams.csv;
+
+import static es.uniovi.raul.teams.cli.CommandLine.*;
 
 import java.io.*;
 import java.util.*;
@@ -6,9 +8,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import es.uniovi.eii.ds.model.*;
-
-import static es.uniovi.eii.ds.cli.CommandLine.*;
+import es.uniovi.raul.teams.model.*;
 
 public class ModelLoader {
 

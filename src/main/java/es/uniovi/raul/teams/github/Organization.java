@@ -1,10 +1,10 @@
-package es.uniovi.eii.ds.github;
+package es.uniovi.raul.teams.github;
 
-import static es.uniovi.eii.ds.cli.CommandLine.*;
+import static es.uniovi.raul.teams.cli.CommandLine.*;
 
 import java.util.*;
 
-import es.uniovi.eii.ds.model.*;
+import es.uniovi.raul.teams.model.*;
 
 public class Organization {
     public static ProcessResult updateOrganization(String token, String org, List<Team> teams) {

@@ -1,14 +1,14 @@
-package es.uniovi.eii.ds.main;
+package es.uniovi.raul.teams.main;
 
-import static es.uniovi.eii.ds.cli.CommandLine.*;
+import static es.uniovi.raul.teams.cli.CommandLine.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import es.uniovi.eii.ds.csv.ModelLoader;
-import es.uniovi.eii.ds.github.Organization;
-import es.uniovi.eii.ds.github.Organization.ProcessResult;
-import es.uniovi.eii.ds.model.*;
+import es.uniovi.raul.teams.csv.ModelLoader;
+import es.uniovi.raul.teams.github.Organization;
+import es.uniovi.raul.teams.github.Organization.ProcessResult;
+import es.uniovi.raul.teams.model.*;
 
 public class Main {
     public static void main(String[] args) {

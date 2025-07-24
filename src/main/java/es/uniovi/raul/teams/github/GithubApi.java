@@ -1,13 +1,13 @@
-package es.uniovi.eii.ds.github;
+package es.uniovi.raul.teams.github;
 
-import static es.uniovi.eii.ds.cli.CommandLine.*;
+import static es.uniovi.raul.teams.cli.CommandLine.*;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.*;
 import java.util.*;
 
-public class GithubApi {
+public final class GithubApi {
     public enum ApiResult {
         OK,
         ALREADY_EXISTS,

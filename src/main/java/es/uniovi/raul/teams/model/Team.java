@@ -1,9 +1,9 @@
-package es.uniovi.eii.ds.model;
+package es.uniovi.raul.teams.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Team {
+public final class Team {
     private final String name;
     private final List<Student> students = new ArrayList<>();
 
