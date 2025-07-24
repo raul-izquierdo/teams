@@ -65,7 +65,7 @@ public class CommandLine {
     public static void printHelp() {
         System.out.println(
                 """
-                        Usage: java -jar create_teams.jar [<csvfile>] [-t <token>] [-o <organization>]
+                        Usage: java -jar teams.jar [<csvfile>] [-t <token>] [-o <organization>]
 
                         Options:
                           <csvfile>            The roster CSV file downloaded from the classroom
