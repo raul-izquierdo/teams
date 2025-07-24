@@ -85,6 +85,16 @@ public class CommandLine {
                         If a team or student already exists, it is ignored. Students without GitHub
                         username or id are skipped.
                         """);
+
+        printCredits();
+    }
+
+    public static void printCredits() {
+        System.out.println("""
+
+                Escuela de Ingenieria Informatica. Universidad de Oviedo.
+                Raúl Izquierdo Castanedo (raul@uniovi.es)
+                """);
     }
 
     private static void addEnvironmentIfAbsent(Map<String, String> map, String key, String envKey) {

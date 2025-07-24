@@ -29,6 +29,8 @@ public class Main {
         var result = Organization.updateOrganization(token, organization, teams);
 
         printSummary(result);
+
+        printCredits();
     }
 
     private static void printSummary(ProcessResult result) {
