@@ -2,10 +2,11 @@ package es.uniovi.raul.teams.main;
 
 import static es.uniovi.raul.teams.cli.CommandLine.*;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import es.uniovi.raul.teams.csv.ModelLoader;
+import es.uniovi.raul.teams.csv.*;
 import es.uniovi.raul.teams.github.Organization;
 import es.uniovi.raul.teams.github.Organization.ProcessResult;
 import es.uniovi.raul.teams.model.*;
@@ -19,14 +20,23 @@ public class Main {
             return;
         }
 
-        String token = cliArguments.get("-t");
-        String organization = cliArguments.get("-o");
-        String csvFile = cliArguments.get("csv");
-        List<Team> teams = ModelLoader.loadModel(csvFile);
-        if (teams.isEmpty())
-            return;
+        var teamNameProvider = new PrefixBasedStrategy(cliArguments.get(TEAMS_PREFIX_FLAG));
+        TeamsCollector teamsCollector = new TeamsCollector(teamNameProvider);
+        try {
+            ModelLoader.readStudents(cliArguments.get("csv"), teamsCollector);
 
-        var result = Organization.updateOrganization(token, organization, teams);
+            if (teamsCollector.hasErrors()) {
+                System.err.println("Errors occurred while reading the CSV file. Please fix them and try again.");
+                return;
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading CSV file: " + e.getMessage());
+            return;
+        }
+
+        String token = cliArguments.get(TOKEN_FLAG);
+        String organization = cliArguments.get(ORGANIZATION_FLAG);
+        var result = Organization.updateOrganization(token, organization, teamsCollector.getTeams());
 
         printSummary(result);
 
@@ -45,7 +55,7 @@ public class Main {
         else {
             System.out.println();
             for (Student student : result.addedStudents())
-                System.out.println("   " + student.identifier());
+                System.out.println("   " + student.studentId());
         }
         System.out.println("- Already in team: " + result.alreadyInTeam().size());
         System.out.println("- Missing GitHub usernames: " + result.missingUsername().size());
@@ -55,7 +65,7 @@ public class Main {
         else {
             System.out.println();
             for (Student student : result.rejectedStudents())
-                System.out.println("      " + student.identifier() + ", " + student.githubUsername());
+                System.out.println("      " + student.studentId() + ", " + student.githubUsername());
         }
     }
 
@@ -74,4 +84,19 @@ public class Main {
         return text == null || text.isEmpty() ? "0" : text;
     }
 
+}
+
+class PrefixBasedStrategy implements TeamNamingStrategy {
+    private final String prefix;
+
+    PrefixBasedStrategy(String prefix) {
+        if (prefix == null)
+            throw new IllegalArgumentException("Prefix cannot be null");
+        this.prefix = prefix;
+    }
+
+    @Override
+    public String getTeamName(String groupId) {
+        return prefix + groupId;
+    }
 }
