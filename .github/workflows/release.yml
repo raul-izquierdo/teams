@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*' # Esto activará el workflow cuando se cree una nueva etiqueta que empiece por 'v', por ejemplo, v1.0.0
 
+permissions:
+  contents: write # This is the crucial line!
+
 jobs:
   build_and_release:
     runs-on: ubuntu-latest # Ejecuta el trabajo en un sistema operativo Ubuntu
