@@ -7,8 +7,10 @@ import org.apache.commons.csv.*;
 public class ModelLoader {
 
     public static void readStudents(String csvFile, StudentsCollector collector) throws IOException {
+
         var reader = new java.io.FileReader(csvFile);
         readStudents(reader, collector);
+        reader.close();
     }
 
     public static void readStudents(Reader reader, StudentsCollector collector) throws IOException {

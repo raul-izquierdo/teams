@@ -1,25 +1,18 @@
 package es.uniovi.raul.teams.model;
 
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * Represents a team in the system.
+ * Each team has a display name, a slug (unique identifier)
+ *
+ * @param displayName the display name of the team
+ * @param slug the unique identifier (slug) of the team
+ */
+public record Team(String displayName, String slug) {
 
-public final class Team {
-    private final String name;
-    private final List<Student> students = new ArrayList<>();
-
-    public Team(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<Student> getStudents() {
-        return students;
-    }
-
-    public void addStudent(Student student) {
-        students.add(student);
+    public Team {
+        if (displayName == null || displayName.isBlank())
+            throw new IllegalArgumentException("Display name cannot be null or blank.");
+        if (slug == null || slug.isBlank())
+            throw new IllegalArgumentException("Slug cannot be null or blank.");
     }
 }

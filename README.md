@@ -1,4 +1,4 @@
-# create_teams
+# Teams
 
 This Java application automates the creation of GitHub teams and the assignment of students to those teams based on a CSV roster exported from GitHub Classroom.
 
@@ -16,7 +16,7 @@ The main functionalities of this application include:
 The jar can be downloaded from the [releases page](https://github.com/raul-izquierdo/create_teams/releases).
 
 ```bash
-java -jar create_teams.jar <csv_file> -o <organization> -t <token>
+java -jar teams.jar <csv_file> -o <organization> -t <token>
 ```
 
 ### CSV File Format
@@ -25,16 +25,19 @@ The csv file is just the csv file exported from GitHub Classroom. For example, i
 
 ```csv
 "identifier","github_username","github_id","name"
-"01-perez perez mariano","yaagma","",""
-"02-gonzalez peon eduardo","edu23","",""
+"01-Perez Perez, Mariano","yaagma","",""
+"02-Gonzalez Peon Eduardo","edu23","",""
 ```
 
 The only required columns are the first two: `identifier` and `github_username`.
 
-The `identifier`, when the roster was created, it should have followed the format: `<group_id>-<name>` (e.g., `01-perez perez mariano`). This is the most important part as it determines the team creation and student assignment.
+The `identifier`, when the roster was created, it should have followed the format: `<group_id>-<name>` (e.g., `01-Perez Perez, Mariano`). This is the most important part as it determines the team creation and student assignment.
 
-The teams are created based on the first two digits of the identifiers. For example, if there is an identifier `01-perez perez mariano`, a team named `G01` will be created, and every student with an identifier starting with `01-` will be added to this team.
+The teams are created based on the first two digits of the identifiers. For example, if there is an identifier `01-Perez Perez, Mariano`, a team named `G01` will be created, and every student with an identifier starting with `01-` will be added to this team.
 
+<!-- TODO: 📅 /**/ Lo del prefijo es configurable -->
+
+<!-- TODO: 📅 /**/ Copiar cosas del printHelp -->
 
 ## The Token
 
@@ -46,4 +49,6 @@ You can provide the GitHub API token in three ways (in order of precedence):
 
 ## License
 
-MIT
+MIT License
+
+Copyright (c) 2025 Raul Izquierdo Castanedo

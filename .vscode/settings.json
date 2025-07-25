@@ -1,4 +1,5 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
-    "java.checkstyle.configuration": "checkstyle.xml"
+    "java.checkstyle.configuration": "checkstyle.xml",
+    "java.checkstyle.version": "10.26.1"
 }
