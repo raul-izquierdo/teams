@@ -7,7 +7,7 @@ import java.util.*;
 import es.uniovi.raul.teams.csv.StudentsCollector;
 import es.uniovi.raul.teams.model.Student;
 
-class ListCollector implements StudentsCollector {
+public final class ListCollector implements StudentsCollector {
 
     private List<Student> students = new ArrayList<>();
 
