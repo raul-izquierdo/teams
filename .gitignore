@@ -1,4 +1,5 @@
 classroom_roster.csv
+.vscode/launch.json
 
 # Maven target directory
 /target/
