@@ -1,4 +1,4 @@
-package es.uniovi.raul.teams.csv;
+package es.uniovi.raul.teams.roster;
 
 /**
  * Interface for collecting student data from a CSV file.
@@ -6,5 +6,5 @@ package es.uniovi.raul.teams.csv;
  */
 @FunctionalInterface
 public interface StudentsCollector {
-    void collectStudentData(long line, String studentId, String githubUsername) throws IllegalArgumentException;
+    void collectStudentData(long line, String rosterId, String githubUsername) throws IllegalArgumentException;
 }

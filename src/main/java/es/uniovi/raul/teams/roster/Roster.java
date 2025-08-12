@@ -1,10 +1,10 @@
-package es.uniovi.raul.teams.csv;
+package es.uniovi.raul.teams.roster;
 
 import java.io.*;
 
 import org.apache.commons.csv.*;
 
-public class ModelLoader {
+public class Roster {
 
     public static void readStudents(String csvFile, StudentsCollector collector) throws IOException {
 
@@ -19,10 +19,10 @@ public class ModelLoader {
 
             for (CSVRecord csvRecord : parser) {
 
-                String studentId = csvRecord.get("identifier");
+                String rosterId = csvRecord.get("identifier");
                 String githubUsername = csvRecord.get("github_username");
 
-                collector.collectStudentData(csvRecord.getRecordNumber(), studentId, githubUsername);
+                collector.collectStudentData(csvRecord.getRecordNumber(), rosterId, githubUsername);
             }
         }
     }

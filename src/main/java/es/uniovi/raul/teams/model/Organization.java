@@ -54,11 +54,11 @@ public final class Organization {
                                     GithubApi.addStudentToTeam(token, name, team.slug(), student.githubUsername());
                                 } catch (Exception e) {
                                     System.err.printf("ERROR. Failed to add student '%s' to team '%s': %s%n",
-                                            student.studentId(), team.displayName(), e.getMessage());
+                                            student.rosterId(), team.displayName(), e.getMessage());
                                 }
                             },
                             () -> System.err.printf("No team found for group ID '%s'. Skipping student '%s'.%n",
-                                    student.groupId(), student.studentId()));
+                                    student.groupId(), student.rosterId()));
         }
 
     }

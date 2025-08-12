@@ -1,8 +1,14 @@
 package es.uniovi.raul.teams.model;
 
-public record Student(String studentId, String githubUsername) {
+/**
+ * Represents a student with a student ID and GitHub username.
+ *
+ * @param rosterId       The unique identifier for the student, which must contain a hyphen.
+ * @param githubUsername  The GitHub username of the student.
+ */
+public record Student(String rosterId, String githubUsername) {
     public Student {
-        if (studentId == null || !studentId.matches(".+-.+"))
+        if (rosterId == null || !rosterId.matches(".+-.+"))
             throw new IllegalArgumentException("Student ID must contain a hyphen with characters on both sides.");
 
         if (githubUsername == null || githubUsername.isBlank())
@@ -18,8 +24,8 @@ public record Student(String studentId, String githubUsername) {
     public String groupId() {
 
         // hyphenIndex should always be valid due to the constructor validation
-        int hyphenIndex = studentId.indexOf('-');
+        int hyphenIndex = rosterId.indexOf('-');
 
-        return studentId.substring(0, hyphenIndex);
+        return rosterId.substring(0, hyphenIndex);
     }
 }

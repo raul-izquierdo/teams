@@ -5,8 +5,8 @@ import static es.uniovi.raul.teams.cli.CommandLine.*;
 import java.io.IOException;
 import java.util.Map;
 
-import es.uniovi.raul.teams.csv.ModelLoader;
 import es.uniovi.raul.teams.model.*;
+import es.uniovi.raul.teams.roster.Roster;
 
 public class Main {
     public static void main(String[] args) {
@@ -19,7 +19,7 @@ public class Main {
 
         ListCollector studentsCollector = new ListCollector();
         try {
-            ModelLoader.readStudents(cliArguments.get("csv"), studentsCollector);
+            Roster.readStudents(cliArguments.get("csv"), studentsCollector);
         } catch (IllegalArgumentException e) {
             System.err.println("Invalid values in CSV file. Please fix them and try again.");
             System.err.println(e.getMessage());

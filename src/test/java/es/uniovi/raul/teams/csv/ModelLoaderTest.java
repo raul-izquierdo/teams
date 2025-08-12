@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import es.uniovi.raul.teams.main.ListCollector;
 import es.uniovi.raul.teams.model.Student;
+import es.uniovi.raul.teams.roster.Roster;
 
 class ModelLoaderTest {
     @Test
@@ -23,18 +24,18 @@ class ModelLoaderTest {
         csv = stripLeadingSpaces(csv);
         Reader reader = new StringReader(csv);
         ListCollector collector = new ListCollector();
-        ModelLoader.readStudents(reader, collector);
+        Roster.readStudents(reader, collector);
         List<Student> students = collector.getStudents();
 
         assertEquals(2, students.size()); // Only students with github_username should be collected
 
         var student0 = students.get(0);
-        assertEquals("i01-yaagma", student0.studentId());
+        assertEquals("i01-yaagma", student0.rosterId());
         assertEquals("yaagma", student0.githubUsername());
         assertEquals("i01", student0.groupId());
 
         var student1 = students.get(1);
-        assertEquals("i02-yaagma", student1.studentId());
+        assertEquals("i02-yaagma", student1.rosterId());
         assertEquals("yaagma", student1.githubUsername());
         assertEquals("i02", student1.groupId());
     }
@@ -49,7 +50,7 @@ class ModelLoaderTest {
         Reader reader = new StringReader(csv);
         ListCollector collector = new ListCollector();
         assertThrows(IllegalArgumentException.class, () -> {
-            ModelLoader.readStudents(reader, collector);
+            Roster.readStudents(reader, collector);
         });
     }
 
@@ -65,7 +66,7 @@ class ModelLoaderTest {
         Reader reader = new StringReader(csv);
         ListCollector collector = new ListCollector();
         assertThrows(Exception.class, () -> {
-            ModelLoader.readStudents(reader, collector);
+            Roster.readStudents(reader, collector);
         });
     }
 
