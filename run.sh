@@ -1,2 +1,2 @@
 #!/bin/bash
-./mvnw compile exec:java
+./mvnw -o -Pfast compile exec:java -Dexec.args="$*"

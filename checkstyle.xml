@@ -213,6 +213,7 @@
         <module name="JavadocTagContinuationIndentation" />
 
         <module name="JavadocType">
+            <property name="scope" value="protected" />
         </module>
 
         <!-- <module name="JavadocVariable">
@@ -457,7 +458,9 @@
             <property name="processJavadoc" value="false" />
         </module>
 
-        <module name="UnusedLocalVariable" />
+        <module name="UnusedLocalVariable">
+            <property name="severity" value="warning" />
+        </module>
 
         <module name="UpperEll" />
 

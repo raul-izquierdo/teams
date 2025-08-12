@@ -1,4 +1,9 @@
+# Project specific files
+
 classroom_roster.csv
+
+# Visual Studio Code
+
 .vscode/launch.json
 
 # Maven target directory

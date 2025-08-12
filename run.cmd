@@ -1,2 +1,2 @@
 @echo off
-mvnw.cmd compile exec:java
+mvnw.cmd -o -Pfast compile exec:java -Dexec.args="%*"
