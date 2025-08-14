@@ -57,10 +57,19 @@ public final class Roster {
 
                 String rosterId = getValue(csvRecord, "identifier");
 
-                var studentName = RosterNaming.extractStudentName(rosterId);
-                var group = RosterNaming.extractGroup(rosterId);
+                try {
 
-                roster.add(new Student(studentName, group, rosterId, githubUsername.get()));
+                    var studentName = RosterNaming.extractStudentName(rosterId);
+                    var group = RosterNaming.extractGroup(rosterId);
+
+                    roster.add(new Student(studentName, group, rosterId, githubUsername.get()));
+
+                } catch (IllegalArgumentException e) {
+                    throw new InvalidRosterFormatException(
+                            format("Record #%d: '%s' -> %s", csvRecord.getRecordNumber(), join(", ", csvRecord),
+                                    e.getMessage()));
+                }
+
             }
         }
 
