@@ -9,6 +9,9 @@ import es.uniovi.raul.teams.github.GithubConnectionImpl;
 import es.uniovi.raul.teams.roster.Roster;
 import es.uniovi.raul.teams.roster.Roster.InvalidRosterFormatException;
 
+/**
+ * Entry point for the application.
+ */
 public class Main {
 
     public static void main(String[] args) {
@@ -45,8 +48,8 @@ public class Main {
             organization.deleteGroupTeams();
 
         else {
-            var students = Roster.load(arguments.exclusive.rosterFile);
-            organization.update(students);
+            var roster = new Roster(arguments.exclusive.rosterFile);
+            organization.update(roster.getStudents());
         }
     }
 
