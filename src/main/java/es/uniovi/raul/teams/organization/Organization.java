@@ -47,7 +47,8 @@ public final class Organization {
 
         updateTeams(students.stream()
                 .map(Student::group)
-                .distinct());
+                .distinct()
+                .toList());
 
         updateTeamsMembers(students);
     }
@@ -74,14 +75,8 @@ public final class Organization {
      * and remove teams that are no longer needed.
      *
      * Only teams that correspond to groups teams (follow the naming convention) will be removed.
-     *
-     * @param requiredGroups the stream of group names that should end up as teams
-     * @throws UnexpectedFormatException if the format of the data from the GitHub API is unexpected
-     * @throws RejectedOperationException if an operation is rejected by the GitHub API
-     * @throws IOException if a network or I/O error occurs
-     * @throws InterruptedException if the operation is interrupted
      */
-    public void updateTeams(Stream<String> requiredGroups)
+    private void updateTeams(List<String> requiredGroups)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         var existingTeams = getGroupTeams();
@@ -89,6 +84,9 @@ public final class Organization {
         lookForTeamsToRemove(requiredGroups, existingTeams);
     }
 
+    /**
+     * Updates the members of each team based on the provided list of students.
+     */
     private void updateTeamsMembers(List<Student> students)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
@@ -120,10 +118,10 @@ public final class Organization {
 
     }
 
-    private void lookForNewTeams(Stream<String> groups, List<GroupTeam> existingTeams)
+    private void lookForNewTeams(List<String> groups, List<GroupTeam> existingTeams)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        List<String> teamsToCreate = groups
+        List<String> teamsToCreate = groups.stream()
                 .map(TeamNaming::toTeam)
                 .filter(teamName -> existingTeams.stream()
                         .noneMatch(existingTeam -> existingTeam.displayName().equals(teamName)))
@@ -133,11 +131,11 @@ public final class Organization {
             githubApi.createTeam(organizationName, team);
     }
 
-    private void lookForTeamsToRemove(Stream<String> groups, List<GroupTeam> existingTeams)
+    private void lookForTeamsToRemove(List<String> groups, List<GroupTeam> existingTeams)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         List<GroupTeam> teamsToRemove = existingTeams.stream()
-                .filter(team -> groups.noneMatch(team::isAssociatedWith))
+                .filter(team -> groups.stream().noneMatch(team::isAssociatedWith))
                 .toList();
 
         for (var team : teamsToRemove)
