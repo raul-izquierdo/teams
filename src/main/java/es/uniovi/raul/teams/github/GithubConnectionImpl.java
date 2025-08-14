@@ -1,4 +1,3 @@
-
 package es.uniovi.raul.teams.github;
 
 import java.io.IOException;
@@ -9,48 +8,29 @@ import java.util.*;
 
 import com.fasterxml.jackson.databind.*;
 
-import es.uniovi.raul.teams.model.Team;
-
 /**
- * Github API wrapper for managing teams.
+ * Github API implementation.
  */
-public final class GithubApi {
+public final class GithubConnectionImpl implements GithubConnection {
 
-    /**
-     * Exception thrown when the response format is unexpected.
-     */
-    public static class UnexpectedFormatException extends Exception {
-        public UnexpectedFormatException(String message) {
-            super(message);
-        }
+    private String token;
+
+    public GithubConnectionImpl(String token) {
+        if (token == null || token.isBlank())
+            throw new IllegalArgumentException("Token cannot be null or blank.");
+
+        this.token = token;
     }
 
-    /**
-     * Exception thrown when the operation is rejected by GitHub API.
-     */
-    public static class RejectedOperationException extends Exception {
-        public RejectedOperationException(String message) {
-            super(message);
-        }
-    }
-
-    /**
-     * Downloads the list of teams from the specified organization.
-     *
-     * @param token        GitHub API token
-     * @param organization Organization name
-     * @return List of teams in the organization
-     * @throws UnexpectedFormatException if the response format is unexpected
-     * @throws RejectedOperationException if the operation is rejected by GitHub API
-     */
-    public static List<Team> downloadTeamsInfo(String token, String organization)
+    @Override
+    public List<Team> getTeamsInfo(String organization)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         List<Team> teams = new ArrayList<>();
         try (HttpClient client = HttpClient.newHttpClient()) {
 
             String url = "https://api.github.com/orgs/" + organization + "/teams";
-            HttpRequest request = createHttpRequestBuilder(token, url).build();
+            HttpRequest request = createHttpRequestBuilder(url).build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -78,18 +58,8 @@ public final class GithubApi {
         }
     }
 
-    /**
-     * Creates a new team in the specified organization with the given display name.
-     * If the team already exists, it returns an empty Optional.
-     *
-     * @param token          GitHub API token
-     * @param organization   Organization name
-     * @param teamDisplayName Display name for the new team
-     * @return Optional containing the created team slug or empty if the team already exists
-     * @throws UnexpectedFormatException if the response format is unexpected
-     * @throws RejectedOperationException if the operation is rejected by GitHub API
-     */
-    public static Optional<String> createTeam(String token, String organization, String teamDisplayName)
+    @Override
+    public Optional<String> createTeam(String organization, String teamDisplayName)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         try (HttpClient client = HttpClient.newHttpClient()) {
@@ -97,7 +67,7 @@ public final class GithubApi {
             String url = "https://api.github.com/orgs/" + organization + "/teams";
             String json = String.format("{\"name\":\"%s\",\"privacy\":\"closed\"}", teamDisplayName);
 
-            HttpRequest request = createHttpRequestBuilder(token, url)
+            HttpRequest request = createHttpRequestBuilder(url)
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -124,29 +94,37 @@ public final class GithubApi {
         }
     }
 
-    /**
-     * Adds a student to a team in the specified organization.
-     * <p>
-     * If the operation is successful (student is added or already a member), the method returns normally.
-     * If the operation is rejected by the GitHub API, a {@link RejectedOperationException} is thrown.
-     * <p>
-     *
-     * @param token          GitHub API token
-     * @param organization   Organization name
-     * @param teamSlug       Slug of the team to which the student will be added
-     * @param githubUsername GitHub username of the student
-     * @throws RejectedOperationException if the operation is rejected by GitHub API
-     * @throws IOException if a network error occurs
-     * @throws InterruptedException if the operation is interrupted
-     */
-    public static void addStudentToTeam(String token, String organization, String teamSlug, String githubUsername)
+    @Override
+    public void deleteTeam(String organization, String teamSlug)
+            throws IOException, InterruptedException, RejectedOperationException {
+
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            String url = String.format("https://api.github.com/orgs/%s/teams/%s", organization, teamSlug);
+            HttpRequest request = createHttpRequestBuilder(url)
+                    .DELETE()
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            // GitHub returns 204 if deleted, 404 if not found (treat both as success)
+            if (response.statusCode() == 204 || response.statusCode() == 404)
+                return;
+
+            throw new RejectedOperationException(
+                    "Failed to delete team (slug) '" + teamSlug + "'. Status: "
+                            + response.statusCode() + ". Response: " + response.body());
+        }
+    }
+
+    @Override
+    public void addStudentToTeam(String organization, String teamSlug, String githubUsername)
             throws RejectedOperationException, IOException, InterruptedException {
 
         try (HttpClient client = HttpClient.newHttpClient()) {
 
             String url = String.format("https://api.github.com/orgs/%s/teams/%s/memberships/%s", organization,
                     teamSlug, githubUsername);
-            HttpRequest request = createHttpRequestBuilder(token, url)
+            HttpRequest request = createHttpRequestBuilder(url)
                     .PUT(HttpRequest.BodyPublishers.noBody())
                     .build();
 
@@ -162,29 +140,15 @@ public final class GithubApi {
         }
     }
 
-    /**
-    * Removes a student from a team in the specified organization.
-    * <p>
-    * If the operation is successful (student is removed or was not a member), the method returns normally.
-    * If the operation is rejected by the GitHub API, a {@link RejectedOperationException} is thrown.
-    * <p>
-    *
-    * @param token          GitHub API token
-    * @param organization   Organization name
-    * @param teamSlug       Slug of the team from which the student will be removed
-    * @param githubUsername GitHub username of the student
-    * @throws RejectedOperationException if the operation is rejected by GitHub API
-    * @throws IOException if a network error occurs
-    * @throws InterruptedException if the operation is interrupted
-    */
-    public static void removeStudentFromTeam(String token, String organization, String teamSlug, String githubUsername)
+    @Override
+    public void removeStudentFromTeam(String organization, String teamSlug, String githubUsername)
             throws RejectedOperationException, IOException, InterruptedException {
 
         try (HttpClient client = HttpClient.newHttpClient()) {
 
             String url = String.format("https://api.github.com/orgs/%s/teams/%s/memberships/%s", organization,
                     teamSlug, githubUsername);
-            HttpRequest request = createHttpRequestBuilder(token, url)
+            HttpRequest request = createHttpRequestBuilder(url)
                     .DELETE()
                     .build();
 
@@ -200,26 +164,15 @@ public final class GithubApi {
         }
     }
 
-    /**
-    * Returns a list of GitHub usernames (logins) for the members of a given team in the specified organization.
-    *
-    * @param token        GitHub API token
-    * @param organization Organization name
-    * @param teamSlug     Slug of the team
-    * @return List of GitHub usernames (logins) in the team
-    * @throws UnexpectedFormatException if the response format is unexpected
-    * @throws RejectedOperationException if the operation is rejected by GitHub API
-    * @throws IOException if a network error occurs
-    * @throws InterruptedException if the operation is interrupted
-    */
-    public static List<String> getTeamMembers(String token, String organization, String teamSlug)
+    @Override
+    public List<String> getTeamMembers(String organization, String teamSlug)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         List<String> members = new ArrayList<>();
 
         try (HttpClient client = HttpClient.newHttpClient()) {
             String url = String.format("https://api.github.com/orgs/%s/teams/%s/members", organization, teamSlug);
-            HttpRequest request = createHttpRequestBuilder(token, url)
+            HttpRequest request = createHttpRequestBuilder(url)
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -250,7 +203,7 @@ public final class GithubApi {
 
     //# Auxiliary methods -----------------------------------
 
-    private static Builder createHttpRequestBuilder(String token, String url) {
+    private Builder createHttpRequestBuilder(String url) {
         return HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Authorization", "Bearer " + token)

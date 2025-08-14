@@ -1,4 +1,4 @@
-package es.uniovi.raul.teams.model;
+package es.uniovi.raul.teams.github;
 
 /**
  * Represents a team in the system.
@@ -10,8 +10,10 @@ package es.uniovi.raul.teams.model;
 public record Team(String displayName, String slug) {
 
     public Team {
+
         if (displayName == null || displayName.isBlank())
             throw new IllegalArgumentException("Display name cannot be null or blank.");
+
         if (slug == null || slug.isBlank())
             throw new IllegalArgumentException("Slug cannot be null or blank.");
     }
