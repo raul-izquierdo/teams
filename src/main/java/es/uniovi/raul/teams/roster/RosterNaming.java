@@ -44,24 +44,27 @@ public final class RosterNaming {
         return rosterId.substring(openIdx + OPEN.length(), closeIdx);
     }
 
-    private static void checkRosterIdStructure(String rosterId) {
+    public static boolean isValidRosterId(String rosterId) {
         int openIdx = rosterId.lastIndexOf(OPEN);
         int closeIdx = rosterId.lastIndexOf(CLOSE);
 
         // Error si no hay paréntesis o están mal colocados
         if (openIdx == -1 || closeIdx == -1 || openIdx >= closeIdx)
-            throwException(rosterId);
+            return false;
         // Si no hay nada antes o dentro de los paréntesis, no es un formato válido
         if (openIdx == 0 || openIdx + OPEN.length() == closeIdx)
-            throwException(rosterId);
+            return false;
         // Si hay algo después del cierre
         if (closeIdx + CLOSE.length() != rosterId.length())
-            throwException(rosterId);
+            return false;
+
+        return true;
     }
 
-    private static void throwException(String rosterId) {
-        String expectedFormat = "'student name (group)'";
-        throw new IllegalArgumentException(
-                "Invalid roster ID '" + rosterId + "'. Expected format: " + expectedFormat);
+    private static void checkRosterIdStructure(String rosterId) {
+        if (!isValidRosterId(rosterId))
+            throw new IllegalArgumentException(
+                    "Invalid roster ID '" + rosterId + "'. Expected format: 'student name (group)'");
+
     }
 }
