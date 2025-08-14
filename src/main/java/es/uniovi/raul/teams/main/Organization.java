@@ -64,7 +64,7 @@ public final class Organization {
     public void deleteGroupTeams()
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        for (Team team : getGroupTeams())
+        for (var team : getGroupTeams())
             githubApi.deleteTeam(organizationName, team.slug());
     }
 
@@ -92,17 +92,17 @@ public final class Organization {
     private void updateTeamsMembers(List<Student> students)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        for (Team team : getGroupTeams()) {
+        for (var team : getGroupTeams()) {
 
             var studentsInTeam = students.stream()
-                    .filter(student -> TeamNaming.toTeam(student.group()).equals(team.displayName()));
+                    .filter(student -> team.isAssociatedWith(student.group()));
 
             updateTeamMembers(team, studentsInTeam);
         }
 
     }
 
-    private void updateTeamMembers(Team team, Stream<Student> students)
+    private void updateTeamMembers(GroupTeam team, Stream<Student> students)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         List<String> currentMembers = githubApi.getTeamMembers(organizationName, team.slug());
@@ -120,7 +120,7 @@ public final class Organization {
 
     }
 
-    private void lookForNewTeams(Stream<String> groups, List<Team> existingTeams)
+    private void lookForNewTeams(Stream<String> groups, List<GroupTeam> existingTeams)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         List<String> teamsToCreate = groups
@@ -133,23 +133,31 @@ public final class Organization {
             githubApi.createTeam(organizationName, team);
     }
 
-    private void lookForTeamsToRemove(Stream<String> groups, List<Team> existingTeams)
+    private void lookForTeamsToRemove(Stream<String> groups, List<GroupTeam> existingTeams)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        List<Team> teamsToRemove = existingTeams.stream()
-                .filter(team -> groups.noneMatch(group -> TeamNaming.toTeam(group).equals(team.displayName())))
+        List<GroupTeam> teamsToRemove = existingTeams.stream()
+                .filter(team -> groups.noneMatch(team::isAssociatedWith))
                 .toList();
 
-        for (Team team : teamsToRemove)
+        for (var team : teamsToRemove)
             githubApi.deleteTeam(organizationName, team.slug());
     }
 
     // Only return the teams that correspond to groups
-    private List<Team> getGroupTeams()
+    private List<GroupTeam> getGroupTeams()
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         return githubApi.getTeamsInfo(organizationName).stream()
                 .filter(team -> TeamNaming.isGroupTeam(team.displayName()))
+                .map(team -> new GroupTeam(team.displayName(), team.slug(), TeamNaming.toGroup(team.displayName())))
                 .toList();
+    }
+}
+
+record GroupTeam(String displayName, String slug, String group) {
+
+    boolean isAssociatedWith(String otherGroup) {
+        return this.group.equals(otherGroup);
     }
 }

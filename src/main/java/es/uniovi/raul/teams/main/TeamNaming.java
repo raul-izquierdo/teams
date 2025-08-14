@@ -13,6 +13,14 @@ public final class TeamNaming {
         return PREFIX + group;
     }
 
+    public static String toGroup(String teamName) {
+        if (!isGroupTeam(teamName))
+            throw new IllegalArgumentException(
+                    "Team name does not correspond to a group team: it should start with '" + PREFIX + "'");
+
+        return teamName.substring(PREFIX.length());
+    }
+
     public static boolean isGroupTeam(String team) {
         if (team == null)
             throw new IllegalArgumentException("Team name cannot be null");
