@@ -1,4 +1,4 @@
-package es.uniovi.raul.teams.main;
+package es.uniovi.raul.teams.organization;
 
 /**
  * Strategy for naming teams based on their group.

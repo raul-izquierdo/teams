@@ -1,4 +1,4 @@
-package es.uniovi.raul.teams.main;
+package es.uniovi.raul.teams.organization;
 
 import java.io.IOException;
 import java.util.List;

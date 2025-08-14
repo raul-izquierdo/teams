@@ -6,6 +6,7 @@ import java.util.Optional;
 import es.uniovi.raul.teams.cli.*;
 import es.uniovi.raul.teams.github.GithubConnection.*;
 import es.uniovi.raul.teams.github.GithubConnectionImpl;
+import es.uniovi.raul.teams.organization.Organization;
 import es.uniovi.raul.teams.roster.Roster;
 import es.uniovi.raul.teams.roster.Roster.InvalidRosterFormatException;
 
