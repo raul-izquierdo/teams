@@ -45,11 +45,8 @@ public class ArgumentsParser {
                 return Optional.empty();
             }
 
-            checkEnvironment(arguments);
-
-            if ((arguments.token == null || arguments.organization == null))
-                throw new ParameterException(picocli,
-                        "Missing required arguments: 'GITHUB_ORG' and 'GITHUB_TOKEN' should be provided either via command line or in a '.env' file");
+            ensureRequiredEnvironment(arguments);
+            validate(arguments, picocli);
 
             return Optional.of(arguments);
 
@@ -60,13 +57,13 @@ public class ArgumentsParser {
         }
     }
 
-    private static void checkEnvironment(Arguments arguments) {
+    //#  -----------------------------------
+    private static void ensureRequiredEnvironment(Arguments arguments) {
         arguments.token = getEnvironmentIfAbsent(arguments.token, "GITHUB_TOKEN");
         arguments.organization = getEnvironmentIfAbsent(arguments.organization, "GITHUB_ORG");
 
     }
 
-    //#  -----------------------------------
     // Helper methods for environment variables
     private static String getEnvironmentIfAbsent(String argValue, String envKey) {
         if (argValue != null)
@@ -81,5 +78,11 @@ public class ArgumentsParser {
         if (value == null)
             value = System.getenv(key);
         return Optional.ofNullable(value);
+    }
+
+    private static void validate(final Arguments arguments, final CommandLine picocli) {
+        if ((arguments.token == null || arguments.organization == null))
+            throw new ParameterException(picocli,
+                    "Missing required arguments: 'GITHUB_ORG' and 'GITHUB_TOKEN' should be provided either via command line or in a '.env' file");
     }
 }
