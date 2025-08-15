@@ -1,5 +1,7 @@
 package es.uniovi.raul.teams.organization;
 
+import static es.uniovi.raul.teams.organization.TeamNaming.*;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
@@ -93,7 +95,7 @@ public final class Organization {
         for (var team : getGroupTeams()) {
 
             var studentsInTeam = students.stream()
-                    .filter(student -> team.isAssociatedWith(student.group()));
+                    .filter(student -> student.group().equals(team.group()));
 
             updateTeamMembers(team, studentsInTeam);
         }
@@ -147,8 +149,8 @@ public final class Organization {
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         return githubApi.getTeamsInfo(organizationName).stream()
-                .filter(team -> TeamNaming.isGroupTeam(team.displayName()))
-                .map(team -> new GroupTeam(team.displayName(), team.slug(), TeamNaming.toGroup(team.displayName())))
+                .filter(team -> isGroupTeam(team.displayName()))
+                .map(team -> new GroupTeam(team.displayName(), team.slug(), toGroup(team.displayName())))
                 .toList();
     }
 }
