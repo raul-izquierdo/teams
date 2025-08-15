@@ -18,7 +18,7 @@ import es.uniovi.raul.teams.github.GithubConnection.*;
 class OrganizationDeleteGroupTeamsTest {
 
     @Mock
-    GithubConnection github;
+    private GithubConnection github;
 
     @Test
     void deletes_only_group_teams()

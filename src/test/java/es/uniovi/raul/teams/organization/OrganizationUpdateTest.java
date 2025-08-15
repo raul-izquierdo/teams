@@ -22,7 +22,7 @@ import es.uniovi.raul.teams.roster.Student;
 class OrganizationUpdateTest {
 
     @Mock
-    GithubConnection github;
+    private GithubConnection github;
 
     @Test
     void update_creates_teams_and_syncs_members()
@@ -30,7 +30,8 @@ class OrganizationUpdateTest {
 
         // Establecer lo que tiene que simular devolver cada método de la conexión cuando se les llame
         doReturn(List.of()) // La primera invocación que devuelva una lista vacía
-                .doReturn(List.of( // En la segunda, ya habrá dos grupos
+                // En la segunda, ya habrá dos grupos
+                .doReturn(List.of(
                         new Team("group A", "group-a"),
                         new Team("group B", "group-b")))
                 .when(github).getTeamsInfo("org");
