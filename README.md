@@ -8,7 +8,7 @@ The goal of this app is to manage teams and their members in a GitHub organizati
 
 This tool has two main use cases:
 1) During the course, as students enroll or change groups, use this tool to synchronize the teams in the GitHub organization.
-2) When the course ends, use it to remove all the teams created for the year.
+2) When the course ends, use it to remove all the teams created for the semester.
 
 
 ### 1. Create or update teams and their members
@@ -30,12 +30,11 @@ After running `teams.jar`, the teams in the organization and their members will 
 - Existing teams will be updated to match the students listed in the CSV file.
 
 
-Notes:
-- Only the first two columns in the CSV are used. The rest are ignored.
-- Students without a GitHub username are skipped. The GitHub username is required to add students to teams.
+**Note**
+Students without a GitHub username are skipped. The GitHub username is required to add students to teams. So it is important that this tool is used **after** students have accepted their invitations to the classroom and have their GitHub usernames set up.
 
 
-### 2. End-of-year cleanup: remove all group teams
+### 2. End-of-semester Cleanup
 
 When the course ends, delete the teams corresponding to the groups to prepare for a new semester:
 
@@ -61,7 +60,7 @@ java -jar teams.jar [<csvfile>] [-t <token>] [-o <organization>] [--clean]
 | `<csvfile>`           | The roster CSV file downloaded from GitHub Classroom (default: `classroom_roster.csv`).      |
 | `-t <token>`          | GitHub API access token. If not provided, the tool will try to read it from the GITHUB_TOKEN environment variable or from a .env file. |
 | `-o <organization>`   | GitHub organization name. If not provided, the tool will try to read it from the GITHUB_ORG environment variable or from a .env file. |
-| `--clean`             | Remove all group teams from the organization (useful for a new academic year).              |
+| `--clean`             | Remove all group teams from the organization (useful for a new academic semester).              |
 | `-h`, `--help`        | Show this help message.                                                                     |
 
 
