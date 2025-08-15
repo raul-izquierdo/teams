@@ -1,12 +1,12 @@
 package es.uniovi.raul.teams.organization;
 
 import static es.uniovi.raul.teams.organization.TeamNaming.*;
+import static java.lang.String.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Stream;
 
-import es.uniovi.raul.teams.github.*;
+import es.uniovi.raul.teams.github.GithubConnection;
 import es.uniovi.raul.teams.github.GithubConnection.*;
 import es.uniovi.raul.teams.roster.Student;
 
@@ -18,15 +18,23 @@ public final class Organization {
 
     private String organizationName;
     private GithubConnection githubApi;
+    private Logger logger;
 
     public Organization(String organizationName, GithubConnection githubApi) {
+        this(organizationName, githubApi, new ConsoleLogger());
+    }
+
+    public Organization(String organizationName, GithubConnection githubApi, Logger logger) {
         if (githubApi == null)
             throw new IllegalArgumentException("GithubApi cannot be null.");
         if (organizationName == null || organizationName.isBlank())
             throw new IllegalArgumentException("Organization cannot be null or blank.");
+        if (logger == null)
+            throw new IllegalArgumentException("Logger cannot be null.");
 
         this.organizationName = organizationName;
         this.githubApi = githubApi;
+        this.logger = logger;
     }
 
     /**
@@ -67,8 +75,10 @@ public final class Organization {
     public void deleteGroupTeams()
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        for (var team : getGroupTeams())
+        for (var team : getGroupTeams()) {
             githubApi.deleteTeam(organizationName, team.slug());
+            logger.log("[Deleted team] " + team.displayName());
+        }
     }
 
     /**
@@ -95,28 +105,32 @@ public final class Organization {
         for (var team : getGroupTeams()) {
 
             var studentsInTeam = students.stream()
-                    .filter(student -> student.group().equals(team.group()));
+                    .filter(student -> student.group().equals(team.group()))
+                    .toList();
 
             updateTeamMembers(team, studentsInTeam);
         }
 
     }
 
-    private void updateTeamMembers(GroupTeam team, Stream<Student> students)
+    private void updateTeamMembers(GroupTeam team, List<Student> students)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        List<String> currentMembers = githubApi.getTeamMembers(organizationName, team.slug());
-        List<String> studentUsernames = students.map(Student::githubUsername).toList();
-
         // Add missing students
-        for (String username : studentUsernames)
-            if (!currentMembers.contains(username))
-                githubApi.addStudentToTeam(organizationName, team.slug(), username);
+        List<String> existingMembersLogin = githubApi.getTeamMembers(organizationName, team.slug());
+        for (var student : students)
+            if (!existingMembersLogin.contains(student.login())) {
+                githubApi.addStudentToTeam(organizationName, team.slug(), student.login());
+                logger.log(format("[Added student] '%s' to team '%s'", student.name(), team.displayName()));
+            }
 
         // Remove extra members
-        for (String member : currentMembers)
-            if (!studentUsernames.contains(member))
-                githubApi.removeStudentFromTeam(organizationName, team.slug(), member);
+        List<String> studentsLogin = students.stream().map(Student::login).toList();
+        for (String existingLogin : existingMembersLogin)
+            if (!studentsLogin.contains(existingLogin)) {
+                githubApi.removeStudentFromTeam(organizationName, team.slug(), existingLogin);
+                logger.log(format("[Removed student] '%s' from team '%s'", existingLogin, team.displayName()));
+            }
 
     }
 
@@ -129,8 +143,10 @@ public final class Organization {
                         .noneMatch(existingTeam -> existingTeam.displayName().equals(teamName)))
                 .toList();
 
-        for (String team : teamsToCreate)
+        for (String team : teamsToCreate) {
             githubApi.createTeam(organizationName, team);
+            logger.log(format("[Created team] '%s'", team));
+        }
     }
 
     private void lookForTeamsToRemove(List<String> groups, List<GroupTeam> existingTeams)
@@ -140,8 +156,10 @@ public final class Organization {
                 .filter(team -> groups.stream().noneMatch(team::isAssociatedWith))
                 .toList();
 
-        for (var team : teamsToRemove)
+        for (var team : teamsToRemove) {
             githubApi.deleteTeam(organizationName, team.slug());
+            logger.log(format("[Removed team] '%s'", team.displayName()));
+        }
     }
 
     // Only return the teams that correspond to groups

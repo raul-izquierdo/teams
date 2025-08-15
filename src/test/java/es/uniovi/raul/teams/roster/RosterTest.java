@@ -36,13 +36,13 @@ class RosterTest {
         assertEquals("John Doe", s1.name());
         assertEquals("A", s1.group());
         assertEquals("John Doe (A)", s1.rosterId());
-        assertEquals("johnd", s1.githubUsername());
+        assertEquals("johnd", s1.login());
 
         Student s2 = students.get(1);
         assertEquals("Izquierdo Castanedo, Raúl", s2.name());
         assertEquals("i02", s2.group());
         assertEquals("Izquierdo Castanedo, Raúl (i02)", s2.rosterId());
-        assertEquals("raulic", s2.githubUsername());
+        assertEquals("raulic", s2.login());
     }
 
     @Test
@@ -71,7 +71,7 @@ class RosterTest {
         assertEquals(1, students.size());
         assertEquals("Bob", students.get(0).name());
         assertEquals("B", students.get(0).group());
-        assertEquals("bobgh", students.get(0).githubUsername());
+        assertEquals("bobgh", students.get(0).login());
     }
 
     // Parameterized: Header validation failures

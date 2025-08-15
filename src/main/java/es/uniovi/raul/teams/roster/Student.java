@@ -6,9 +6,9 @@ package es.uniovi.raul.teams.roster;
  * @param name            The name of the student
  * @param group           The group of the student
  * @param rosterId        The unique identifier for the student in the roster
- * @param githubUsername  The GitHub username of the student
+ * @param login  The GitHub username of the student
  */
-public record Student(String name, String group, String rosterId, String githubUsername) {
+public record Student(String name, String group, String rosterId, String login) {
     public Student {
 
         if (name == null || name.isBlank())
@@ -20,7 +20,7 @@ public record Student(String name, String group, String rosterId, String githubU
         if (rosterId == null || rosterId.isBlank())
             throw new IllegalArgumentException("Roster ID must not be null or empty");
 
-        if (githubUsername == null || githubUsername.isBlank())
+        if (login == null || login.isBlank())
             throw new IllegalArgumentException("GitHub username cannot be null or blank.");
 
     }
