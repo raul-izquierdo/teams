@@ -29,12 +29,11 @@ class OrganizationUpdateTest {
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         // Establecer lo que tiene que simular devolver cada método de la conexión cuando se les llame
-        doReturn(List.of()) // La primera invocación que devuelva una lista vacía
-                // En la segunda, ya habrá dos grupos
-                .doReturn(List.of(
+        when(github.getTeamsInfo("org"))
+                .thenReturn(List.of()) // La primera invocación que devuelva una lista vacía
+                .thenReturn(List.of(
                         new Team("group A", "group-a"),
-                        new Team("group B", "group-b")))
-                .when(github).getTeamsInfo("org");
+                        new Team("group B", "group-b")));
         when(github.getTeamMembers("org", "group-a")).thenReturn(List.of());
         when(github.getTeamMembers("org", "group-b")).thenReturn(List.of());
         when(github.createTeam("org", "group A")).thenReturn(of("group-a"));
@@ -83,9 +82,9 @@ class OrganizationUpdateTest {
         var other = new Team("random", "random"); // not a group team, must be ignored
 
         // First call: existing teams (A, C, random). Second: after reconciled (A, B)
-        doReturn(List.of(teamA, teamC, other))
-                .doReturn(List.of(teamA, teamB))
-                .when(github).getTeamsInfo("org");
+        when(github.getTeamsInfo("org"))
+                .thenReturn(List.of(teamA, teamC, other))
+                .thenReturn(List.of(teamA, teamB));
 
         // No members initially
         when(github.getTeamMembers("org", "group-a")).thenReturn(List.of());
@@ -129,9 +128,9 @@ class OrganizationUpdateTest {
         var teamB = new Team("group B", "group-b");
 
         // Teams already correct before and after reconciliation
-        doReturn(List.of(teamA, teamB))
-                .doReturn(List.of(teamA, teamB))
-                .when(github).getTeamsInfo("org");
+        when(github.getTeamsInfo("org"))
+                .thenReturn(List.of(teamA, teamB))
+                .thenReturn(List.of(teamA, teamB));
 
         // Initial members: A has bob (to remove), B has carol (kept)
         when(github.getTeamMembers("org", "group-a")).thenReturn(List.of("bob"));
