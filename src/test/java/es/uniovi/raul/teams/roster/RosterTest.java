@@ -27,8 +27,7 @@ class RosterTest {
                 "Izquierdo Castanedo, Raúl (i02)",raulic,1002,Raúl Izquierdo
                 """;
 
-        Roster roster = new Roster(readerOf(csv));
-        List<Student> students = roster.getStudents();
+        List<Student> students = RosterLoader.load(readerOf(csv));
 
         assertEquals(2, students.size());
 
@@ -54,7 +53,7 @@ class RosterTest {
                 """;
 
         Reader r = readerOf(csv);
-        Exception ex = assertThrows(Roster.InvalidRosterFormatException.class, () -> new Roster(r));
+        Exception ex = assertThrows(RosterLoader.InvalidRosterFormatException.class, () -> RosterLoader.load(r));
         assertTrue(ex.getMessage().toLowerCase().contains("no students"));
     }
 
@@ -66,8 +65,7 @@ class RosterTest {
                 "Bob (B)",bobgh,1002,Bob
                 """;
 
-        Roster roster = new Roster(readerOf(csv));
-        List<Student> students = roster.getStudents();
+        List<Student> students = RosterLoader.load(readerOf(csv));
         assertEquals(1, students.size());
         assertEquals("Bob", students.get(0).name());
         assertEquals("B", students.get(0).group());
@@ -95,7 +93,7 @@ class RosterTest {
     @MethodSource("invalidHeaders")
     void failsOnInvalidHeader(String name, String csv) {
         Reader r = readerOf(csv);
-        Exception ex = assertThrows(Roster.InvalidRosterFormatException.class, () -> new Roster(r));
+        Exception ex = assertThrows(RosterLoader.InvalidRosterFormatException.class, () -> RosterLoader.load(r));
         assertTrue(ex.getMessage().toLowerCase().contains("csv"));
     }
 
@@ -124,7 +122,7 @@ class RosterTest {
     @MethodSource("badIdentifiers")
     void failsOnMalformedIdentifier(String name, String csv) {
         Reader r = readerOf(csv);
-        Exception ex = assertThrows(Roster.InvalidRosterFormatException.class, () -> new Roster(r));
+        Exception ex = assertThrows(RosterLoader.InvalidRosterFormatException.class, () -> RosterLoader.load(r));
         assertTrue(ex.getMessage().toLowerCase().contains("invalid roster id"));
     }
 
@@ -138,7 +136,7 @@ class RosterTest {
                     ,alice,1,Alice
                     """;
             Reader r = readerOf(csv);
-            Exception ex = assertThrows(Roster.InvalidRosterFormatException.class, () -> new Roster(r));
+            Exception ex = assertThrows(RosterLoader.InvalidRosterFormatException.class, () -> RosterLoader.load(r));
             assertTrue(ex.getMessage().contains("column 'identifier'"));
         }
 

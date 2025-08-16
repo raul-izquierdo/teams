@@ -45,7 +45,7 @@ class OrganizationUpdateTest {
                 new Student("Alice", "A", "Alice (A)", "alice"),
                 new Student("Bob", "A", "Bob (A)", "bob"),
                 new Student("Carol", "B", "Carol (B)", "carol"));
-        organization.update(students);
+        organization.updateWith(students);
 
         verify(github, times(2)).getTeamsInfo("org");
         verify(github, times(1)).createTeam("org", "group A");
@@ -70,7 +70,7 @@ class OrganizationUpdateTest {
 
         var organization = new Organization("org", github);
 
-        assertThrows(UnexpectedFormatException.class, () -> organization.update(List.of()));
+        assertThrows(UnexpectedFormatException.class, () -> organization.updateWith(List.of()));
     }
 
     @Test
@@ -99,7 +99,7 @@ class OrganizationUpdateTest {
                 new Student("Alice", "A", "Alice (A)", "alice"),
                 new Student("Bob", "B", "Bob (B)", "bob"));
 
-        organization.update(students);
+        organization.updateWith(students);
 
         // Two snapshots of teams
         verify(github, times(2)).getTeamsInfo("org");
@@ -143,7 +143,7 @@ class OrganizationUpdateTest {
                 new Student("Alice", "A", "Alice (A)", "alice"),
                 new Student("Carol", "B", "Carol (B)", "carol"));
 
-        organization.update(students);
+        organization.updateWith(students);
 
         // Two snapshots of teams (update + member sync)
         verify(github, times(2)).getTeamsInfo("org");

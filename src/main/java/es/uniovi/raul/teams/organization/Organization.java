@@ -52,7 +52,7 @@ public final class Organization {
      * @throws UnexpectedFormatException if the data format from the GitHub API is unexpected
      * @throws InterruptedException if the operation is interrupted
      */
-    public void update(List<Student> students)
+    public void updateWith(List<Student> students)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         updateTeams(students.stream()

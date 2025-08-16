@@ -7,8 +7,8 @@ import es.uniovi.raul.teams.cli.*;
 import es.uniovi.raul.teams.github.GithubConnection.*;
 import es.uniovi.raul.teams.github.GithubConnectionImpl;
 import es.uniovi.raul.teams.organization.Organization;
-import es.uniovi.raul.teams.roster.Roster;
-import es.uniovi.raul.teams.roster.Roster.InvalidRosterFormatException;
+import es.uniovi.raul.teams.roster.RosterLoader;
+import es.uniovi.raul.teams.roster.RosterLoader.InvalidRosterFormatException;
 
 /**
  * Entry point for the application.
@@ -47,11 +47,8 @@ public class Main {
 
         if (arguments.exclusive.cleanTeams)
             organization.deleteGroupTeams();
-
-        else {
-            var roster = new Roster(arguments.exclusive.rosterFile);
-            organization.update(roster.getStudents());
-        }
+        else
+            organization.updateWith(RosterLoader.load(arguments.exclusive.rosterFile));
     }
 
 }

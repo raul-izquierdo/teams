@@ -10,23 +10,9 @@ import org.apache.commons.csv.*;
 /**
  * The Roster is the list of students in a GH Classroom that can be downloaded in CSV format from the classroom.
  */
-public final class Roster {
+public final class RosterLoader {
 
-    private List<Student> students;
-
-    public Roster(String rosterFile) throws IOException, InvalidRosterFormatException {
-        students = load(rosterFile);
-    }
-
-    public Roster(Reader reader) throws IOException, InvalidRosterFormatException {
-        students = load(reader);
-    }
-
-    public List<Student> getStudents() {
-        return new ArrayList<>(students);
-    }
-
-    private List<Student> load(String rosterFile)
+    public static List<Student> load(String rosterFile)
             throws IOException, InvalidRosterFormatException {
 
         try (var reader = new java.io.FileReader(rosterFile)) {
@@ -39,7 +25,7 @@ public final class Roster {
         }
     }
 
-    private List<Student> load(Reader reader)
+    public static List<Student> load(Reader reader)
             throws IOException, InvalidRosterFormatException {
 
         List<Student> roster = new ArrayList<>();
@@ -80,7 +66,7 @@ public final class Roster {
     }
 
     // Checks that the header is exactly this four columnos (no more, no less): "identifier","github_username","github_id","name"
-    private void validateHeader(CSVParser parser) throws InvalidRosterFormatException {
+    private static void validateHeader(CSVParser parser) throws InvalidRosterFormatException {
         if (parser.getHeaderMap().size() != 4)
             throw new InvalidRosterFormatException("CSV header must contain exactly 4 columns.");
 
@@ -90,7 +76,7 @@ public final class Roster {
 
     }
 
-    private String getValue(CSVRecord csvRecord, String column) throws InvalidRosterFormatException {
+    private static String getValue(CSVRecord csvRecord, String column) throws InvalidRosterFormatException {
 
         var value = findValue(csvRecord, column);
 
@@ -101,7 +87,7 @@ public final class Roster {
         return value.get();
     }
 
-    private Optional<String> findValue(CSVRecord csvRecord, String column) {
+    private static Optional<String> findValue(CSVRecord csvRecord, String column) {
 
         try {
             String value = csvRecord.get(column);
