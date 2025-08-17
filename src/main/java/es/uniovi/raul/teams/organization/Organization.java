@@ -166,7 +166,7 @@ public final class Organization {
     private List<GroupTeam> getGroupTeams()
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        return githubApi.getTeamsInfo(organizationName).stream()
+        return githubApi.getTeams(organizationName).stream()
                 .filter(team -> isGroupTeam(team.displayName()))
                 .map(team -> new GroupTeam(team.displayName(), team.slug(), toGroup(team.displayName())))
                 .toList();

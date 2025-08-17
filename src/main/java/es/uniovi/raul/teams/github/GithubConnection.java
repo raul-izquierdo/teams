@@ -16,7 +16,7 @@ public interface GithubConnection {
      * @throws RejectedOperationException if the operation is rejected by GitHub API
      * @throws UnexpectedFormatException if the response format is unexpected
      */
-    List<Team> getTeamsInfo(String organization)
+    List<Team> getTeams(String organization)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException;
 
     /**

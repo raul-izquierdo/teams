@@ -29,7 +29,7 @@ class OrganizationUpdateTest {
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         // Establecer lo que tiene que simular devolver cada método de la conexión cuando se les llame
-        when(github.getTeamsInfo("org"))
+        when(github.getTeams("org"))
                 .thenReturn(List.of()) // La primera invocación que devuelva una lista vacía
                 .thenReturn(List.of(
                         new Team("group A", "group-a"),
@@ -46,7 +46,7 @@ class OrganizationUpdateTest {
                 new Student("Carol", "B", "Carol (B)", "carol"));
         organization.updateWith(students);
 
-        verify(github, times(2)).getTeamsInfo("org");
+        verify(github, times(2)).getTeams("org");
         verify(github, times(1)).createTeam("org", "group A");
         verify(github, times(1)).createTeam("org", "group B");
         verify(github, never()).deleteTeam(anyString(), anyString());
@@ -65,7 +65,7 @@ class OrganizationUpdateTest {
     void update_propagates_errors()
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        when(github.getTeamsInfo("org")).thenThrow(new UnexpectedFormatException("boom"));
+        when(github.getTeams("org")).thenThrow(new UnexpectedFormatException("boom"));
 
         var organization = new Organization("org", github);
 
@@ -82,7 +82,7 @@ class OrganizationUpdateTest {
         var other = new Team("random", "random"); // not a group team, must be ignored
 
         // First call: existing teams (A, C, random). Second: after reconciled (A, B)
-        when(github.getTeamsInfo("org"))
+        when(github.getTeams("org"))
                 .thenReturn(List.of(teamA, teamC, other))
                 .thenReturn(List.of(teamA, teamB));
 
@@ -101,7 +101,7 @@ class OrganizationUpdateTest {
         organization.updateWith(students);
 
         // Two snapshots of teams
-        verify(github, times(2)).getTeamsInfo("org");
+        verify(github, times(2)).getTeams("org");
 
         // Team reconciliation
         verify(github, times(1)).createTeam("org", "group B");
@@ -128,7 +128,7 @@ class OrganizationUpdateTest {
         var teamB = new Team("group B", "group-b");
 
         // Teams already correct before and after reconciliation
-        when(github.getTeamsInfo("org"))
+        when(github.getTeams("org"))
                 .thenReturn(List.of(teamA, teamB))
                 .thenReturn(List.of(teamA, teamB));
 
@@ -145,7 +145,7 @@ class OrganizationUpdateTest {
         organization.updateWith(students);
 
         // Two snapshots of teams (update + member sync)
-        verify(github, times(2)).getTeamsInfo("org");
+        verify(github, times(2)).getTeams("org");
 
         // No create/delete of teams
         verify(github, never()).createTeam(anyString(), anyString());

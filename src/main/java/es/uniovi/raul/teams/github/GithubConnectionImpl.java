@@ -23,7 +23,7 @@ public final class GithubConnectionImpl implements GithubConnection {
     }
 
     @Override
-    public List<Team> getTeamsInfo(String organization)
+    public List<Team> getTeams(String organization)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
         List<Team> teams = new ArrayList<>();

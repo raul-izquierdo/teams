@@ -24,7 +24,7 @@ class OrganizationDeleteGroupTeamsTest {
     void deletes_only_group_teams()
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        when(github.getTeamsInfo("org")).thenReturn(List.of(
+        when(github.getTeams("org")).thenReturn(List.of(
                 new Team("group A", "group-a"),
                 new Team("group B", "group-b"),
                 new Team("some other", "other")));
@@ -32,7 +32,7 @@ class OrganizationDeleteGroupTeamsTest {
         var organization = new Organization("org", github);
         organization.deleteGroupTeams();
 
-        verify(github, times(1)).getTeamsInfo("org");
+        verify(github, times(1)).getTeams("org");
         verify(github, times(1)).deleteTeam("org", "group-a");
         verify(github, times(1)).deleteTeam("org", "group-b");
 
@@ -43,12 +43,12 @@ class OrganizationDeleteGroupTeamsTest {
     void no_group_teams_deleted()
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        when(github.getTeamsInfo("org")).thenReturn(Collections.emptyList());
+        when(github.getTeams("org")).thenReturn(Collections.emptyList());
 
         var organization = new Organization("org", github);
         organization.deleteGroupTeams();
 
-        verify(github, times(1)).getTeamsInfo("org");
+        verify(github, times(1)).getTeams("org");
 
         verifyNoMoreInteractions(github);
     }
@@ -57,7 +57,7 @@ class OrganizationDeleteGroupTeamsTest {
     void propagates_errors_from_api()
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        when(github.getTeamsInfo("org")).thenThrow(new GithubConnection.UnexpectedFormatException("boom"));
+        when(github.getTeams("org")).thenThrow(new GithubConnection.UnexpectedFormatException("boom"));
 
         var organization = new Organization("org", github);
 
