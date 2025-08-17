@@ -89,17 +89,12 @@ public final class RosterLoader {
 
     private static Optional<String> findValue(CSVRecord csvRecord, String column) {
 
-        try {
-            String value = csvRecord.get(column);
-
-            if (value == null || value.isBlank()) // For example `,a`
-                return Optional.empty();
-
-            return Optional.of(value);
-
-        } catch (ArrayIndexOutOfBoundsException e) { // Column does not exist
+        if (!csvRecord.isSet(column))
             return Optional.empty();
-        }
+
+        String value = csvRecord.get(column);
+        return (value == null || value.isBlank()) ? Optional.empty() : Optional.of(value);
+
     }
 
     /**
