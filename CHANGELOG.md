@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-The biggest addition is that now roster.jar is not just a tool to add teams or students, but a tool to synchronize a github organization teams with the current state of the groups in the CSV file. This means:
+The biggest addition is that now 'teams.jar' is not just a tool to add teams or students, but a tool to synchronize a github organization teams with the current state of the groups in the CSV file. This means:
 - Now deletes teams that are no longer needed, in addition to creating teams.
 - Now removes students from teams that are no longer needed, in addition to adding students to teams.
 
