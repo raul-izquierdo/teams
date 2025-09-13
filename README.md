@@ -60,7 +60,7 @@ GITHUB_ORG=<your-org>
 GITHUB_TOKEN=<token>
 ```
 
-### Generated Team Names for Groups
+## Generated Team Names for Groups
 
 Teams names are generated from the group names by prefixing them with `group ` (note the space). Examples:
 
