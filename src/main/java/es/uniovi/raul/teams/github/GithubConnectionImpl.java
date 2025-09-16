@@ -35,8 +35,8 @@ public final class GithubConnectionImpl implements GithubConnection {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200)
-                throw new RejectedOperationException("Failed to get existing teams. Status: " + response.statusCode()
-                        + ". Response: " + response.body());
+                throw new RejectedOperationException("Failed to get existing teams for organization '" + organization
+                        + "'. Status: " + response.statusCode() + ". Response: " + response.body());
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response.body());
@@ -89,8 +89,8 @@ public final class GithubConnectionImpl implements GithubConnection {
                 return Optional.empty();
 
             throw new RejectedOperationException(
-                    "Failed to create team '" + teamDisplayName + "'. Status: " + response.statusCode()
-                            + ". Response: " + response.body());
+                    "Failed to create team '" + teamDisplayName + "' in organization '" + organization + "'. Status: "
+                            + response.statusCode() + ". Response: " + response.body());
         }
     }
 
@@ -111,7 +111,7 @@ public final class GithubConnectionImpl implements GithubConnection {
                 return;
 
             throw new RejectedOperationException(
-                    "Failed to delete team (slug) '" + teamSlug + "'. Status: "
+                    "Failed to delete team (slug) '" + teamSlug + "' in organization '" + organization + "'. Status: "
                             + response.statusCode() + ". Response: " + response.body());
         }
     }
@@ -135,7 +135,8 @@ public final class GithubConnectionImpl implements GithubConnection {
                 return;
 
             throw new RejectedOperationException(
-                    "Failed to add user '" + githubUsername + "' to team (slug) '" + teamSlug + "'. Status: "
+                    "Failed to add user '" + githubUsername + "' to team (slug) '" + teamSlug + "' in organization '"
+                            + organization + "'. Status: "
                             + response.statusCode() + ". Response: " + response.body());
         }
     }
@@ -159,7 +160,8 @@ public final class GithubConnectionImpl implements GithubConnection {
                 return;
 
             throw new RejectedOperationException(
-                    "Failed to remove user '" + githubUsername + "' from team (slug) '" + teamSlug + "'. Status: "
+                    "Failed to remove user '" + githubUsername + "' from team (slug) '" + teamSlug
+                            + "' in organization '" + organization + "'. Status: "
                             + response.statusCode() + ". Response: " + response.body());
         }
     }
@@ -178,7 +180,8 @@ public final class GithubConnectionImpl implements GithubConnection {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                throw new RejectedOperationException("Failed to get team members. Status: " + response.statusCode()
+                throw new RejectedOperationException("Failed to get team members for organization '" + organization
+                        + "'. Status: " + response.statusCode()
                         + ". Response: " + response.body());
             }
 
