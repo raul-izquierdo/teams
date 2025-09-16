@@ -121,7 +121,7 @@ public final class Organization {
         for (var student : students)
             if (!existingMembersLogin.contains(student.login())) {
                 githubApi.addStudentToTeam(organizationName, team.slug(), student.login());
-                logger.log(format("[Added student] '%s' to team '%s'", student.name(), team.displayName()));
+                logger.log(format("[Invited student] '%s' to team '%s'", student.name(), team.displayName()));
             }
 
         // Remove extra members

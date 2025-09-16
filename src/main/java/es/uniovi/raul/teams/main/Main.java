@@ -47,8 +47,15 @@ public class Main {
 
         if (arguments.exclusive.cleanTeams)
             organization.deleteGroupTeams();
-        else
+        else {
             organization.updateWith(RosterLoader.load(arguments.exclusive.rosterFile));
+
+            System.out.println("""
+
+                    REMEMBER. Students have been invited to join their groups, but they are not members yet!!!
+                    Each student must accept the invitation sent to their email before they appear in the groups.
+                    """);
+        }
     }
 
 }
