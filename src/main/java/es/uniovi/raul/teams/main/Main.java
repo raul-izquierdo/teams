@@ -48,6 +48,10 @@ public class Main {
         if (arguments.exclusive.cleanTeams)
             organization.deleteGroupTeams();
         else {
+
+            System.out.printf("%nProceeding to update the organization '%s' using the roster file '%s'...%n",
+                    arguments.organization, arguments.exclusive.rosterFile);
+
             organization.updateWith(RosterLoader.load(arguments.exclusive.rosterFile));
 
             System.out.println("""
