@@ -23,9 +23,9 @@ java -jar teams.jar <classroom_roster.csv>
 
 After running `teams.jar`, the teams in the organization and their members will match the contents of the CSV file:
 - New teams will be created for groups that do not already have a team.
-- Existing teams will be updated to match the students listed in the CSV file.
+- Existing teams will be updated to match the students listed in the CSV file. But note that students still **need to accept their invitations** to join the team.
 
-> **Note**. Students without a GitHub username are skipped since it is required to add students to teams. So it is important that this tool is used **after** students have accepted their invitations to the classroom and have their GitHub usernames set up.
+> **Note**. Students without a GitHub username are skipped since it is required to invite students to teams. So it is important that this tool is used **after** students have accepted their invitations to the classroom and have their GitHub usernames set up.
 
 
 ### 2. End-of-semester Cleanup

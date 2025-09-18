@@ -116,11 +116,11 @@ public final class Organization {
     private void updateTeamMembers(GroupTeam team, List<Student> students)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        // Add missing students
+        // Invite missing students
         List<String> existingMembersLogin = githubApi.getTeamMembers(organizationName, team.slug());
         for (var student : students)
             if (!existingMembersLogin.contains(student.login())) {
-                githubApi.addStudentToTeam(organizationName, team.slug(), student.login());
+                githubApi.inviteStudentToTeam(organizationName, team.slug(), student.login());
                 logger.log(format("[Invited student] '%s' to team '%s'", student.name(), team.displayName()));
             }
 

@@ -117,7 +117,7 @@ public final class GithubConnectionImpl implements GithubConnection {
     }
 
     @Override
-    public void addStudentToTeam(String organization, String teamSlug, String githubUsername)
+    public void inviteStudentToTeam(String organization, String teamSlug, String githubUsername)
             throws RejectedOperationException, IOException, InterruptedException {
 
         try (HttpClient client = HttpClient.newHttpClient()) {

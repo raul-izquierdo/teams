@@ -53,9 +53,9 @@ class OrganizationUpdateTest {
 
         verify(github, times(1)).getTeamMembers("org", "group-a");
         verify(github, times(1)).getTeamMembers("org", "group-b");
-        verify(github, times(1)).addStudentToTeam("org", "group-a", "alice");
-        verify(github, times(1)).addStudentToTeam("org", "group-a", "bob");
-        verify(github, times(1)).addStudentToTeam("org", "group-b", "carol");
+        verify(github, times(1)).inviteStudentToTeam("org", "group-a", "alice");
+        verify(github, times(1)).inviteStudentToTeam("org", "group-a", "bob");
+        verify(github, times(1)).inviteStudentToTeam("org", "group-b", "carol");
         verify(github, never()).removeStudentFromTeam(anyString(), anyString(), anyString());
 
         verifyNoMoreInteractions(github);
@@ -113,8 +113,8 @@ class OrganizationUpdateTest {
         // Member sync for A and B
         verify(github, times(1)).getTeamMembers("org", "group-a");
         verify(github, times(1)).getTeamMembers("org", "group-b");
-        verify(github, times(1)).addStudentToTeam("org", "group-a", "alice");
-        verify(github, times(1)).addStudentToTeam("org", "group-b", "bob");
+        verify(github, times(1)).inviteStudentToTeam("org", "group-a", "alice");
+        verify(github, times(1)).inviteStudentToTeam("org", "group-b", "bob");
 
         verify(github, never()).removeStudentFromTeam(anyString(), anyString(), anyString());
         verifyNoMoreInteractions(github);
@@ -154,10 +154,10 @@ class OrganizationUpdateTest {
         // Member sync: add alice to A, remove bob from A; B unchanged
         verify(github, times(1)).getTeamMembers("org", "group-a");
         verify(github, times(1)).getTeamMembers("org", "group-b");
-        verify(github, times(1)).addStudentToTeam("org", "group-a", "alice");
+        verify(github, times(1)).inviteStudentToTeam("org", "group-a", "alice");
         verify(github, times(1)).removeStudentFromTeam("org", "group-a", "bob");
 
-        verify(github, never()).addStudentToTeam("org", "group-b", "carol");
+        verify(github, never()).inviteStudentToTeam("org", "group-b", "carol");
         verifyNoMoreInteractions(github);
     }
 }

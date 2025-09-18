@@ -45,20 +45,20 @@ public interface GithubConnection {
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException;
 
     /**
-     * Adds a student to a team in the specified organization.
+     * Invites a student to a team in the specified organization.
      * <p>
-     * If the operation is successful (student is added or already a member), the method returns normally.
+     * If the operation is successful (student is invited or already a member), the method returns normally.
      * If the operation is rejected by the GitHub API, a {@link RejectedOperationException} is thrown.
      * <p>
      *
      * @param organization   Organization name
-     * @param teamSlug       Slug of the team to which the student will be added
+     * @param teamSlug       Slug of the team to which the student will be invited
      * @param githubUsername GitHub username of the student
      * @throws IOException if a network error occurs
      * @throws RejectedOperationException if the operation is rejected by GitHub API
      * @throws InterruptedException if the operation is interrupted
      */
-    void addStudentToTeam(String organization, String teamSlug, String githubUsername)
+    void inviteStudentToTeam(String organization, String teamSlug, String githubUsername)
             throws RejectedOperationException, IOException, InterruptedException;
 
     /**
