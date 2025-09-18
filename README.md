@@ -16,7 +16,7 @@ This tool has two main use cases:
 
 This tool requires the GitHub accounts of students to enroll them in their respective teams. This information is stored in the classroom roster and must be provided to `teams.jar`. For information on how to obtain the roster file, see [Obtaining the Roster File](https://github.com/raul-izquierdo/classroom-tools#obtaining-the-roster-file).
 
-> **Note**: Students without a GitHub username are skipped since a GitHub account is required to invite them to teams. Therefore, use this tool **after** students have accepted their first classroom assignment, when their GitHub usernames will be added to the roster.
+> **Important**: Students without a GitHub username are skipped since a GitHub account is required to invite them to teams. Therefore, use this tool **after** students have accepted their first classroom assignment, when their GitHub usernames will be added to the roster.
 
 ```bash
 java -jar teams.jar [<classroom_roster.csv>]
