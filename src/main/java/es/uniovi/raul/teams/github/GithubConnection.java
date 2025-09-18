@@ -93,12 +93,32 @@ public interface GithubConnection {
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException;
 
     /**
+    * Returns a list of GitHub usernames (logins) that have a pending invitation to the given team.
+    * This allows callers to decide whether to treat pending invitations as members or not.
+    *
+    * @param organization Organization name
+    * @param teamSlug     Slug of the team
+    * @return List of GitHub usernames (logins) with a pending invitation to the team
+    * @throws IOException if a network error occurs
+    * @throws RejectedOperationException if the operation is rejected by GitHub API
+    * @throws UnexpectedFormatException if the response format is unexpected
+    * @throws InterruptedException if the operation is interrupted
+    */
+    List<String> getTeamInvitations(String organization, String teamSlug)
+            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException;
+
+    /**
     * Exception thrown when the response format is unexpected. Probably the format has changed and this code needs to be updated.
     */
     class UnexpectedFormatException extends Exception {
         public UnexpectedFormatException(String message) {
             super(message);
         }
+
+        public UnexpectedFormatException(String format, Object... args) {
+            super(String.format(format, args));
+        }
+
     }
 
     /**
@@ -107,6 +127,10 @@ public interface GithubConnection {
     class RejectedOperationException extends Exception {
         public RejectedOperationException(String message) {
             super(message);
+        }
+
+        public RejectedOperationException(String format, Object... args) {
+            super(String.format(format, args));
         }
     }
 }

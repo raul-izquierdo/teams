@@ -35,22 +35,22 @@ public final class GithubConnectionImpl implements GithubConnection {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200)
-                throw new RejectedOperationException("Failed to get existing teams for organization '" + organization
-                        + "'. Status: " + response.statusCode() + ". Response: " + response.body());
+                throw new RejectedOperationException(
+                        "Failed to get existing teams for organization '%s'. Status: %d. Response: %s",
+                        organization, response.statusCode(), response.body());
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response.body());
 
             if (!root.isArray())
-                throw new UnexpectedFormatException("Expected a JSON array for teams, got: " + root.getNodeType());
+                throw new UnexpectedFormatException("Expected a JSON array for teams, got: %s", root.getNodeType());
 
             for (JsonNode node : root) {
                 JsonNode nameNode = node.get("name");
                 JsonNode slugNode = node.get("slug");
                 if (nameNode == null || !nameNode.isTextual() || slugNode == null || !slugNode.isTextual())
                     throw new UnexpectedFormatException(
-                            "Expected 'name' and 'slug' fields of type string in each team object, got: "
-                                    + node.toString());
+                            "Expected 'name' and 'slug' fields of type string in each team object, got: %s", node);
 
                 teams.add(new Team(nameNode.asText(), slugNode.asText()));
             }
@@ -80,7 +80,7 @@ public final class GithubConnectionImpl implements GithubConnection {
                 JsonNode slugNode = root.get("slug");
                 if (slugNode == null || !slugNode.isTextual()) {
                     throw new UnexpectedFormatException(
-                            "Expected 'slug' field of type string in created team object, got: " + root.toString());
+                            "Expected 'slug' field of type string in created team object, got: %s", root);
                 }
                 return Optional.of(slugNode.asText());
             }
@@ -89,8 +89,8 @@ public final class GithubConnectionImpl implements GithubConnection {
                 return Optional.empty();
 
             throw new RejectedOperationException(
-                    "Failed to create team '" + teamDisplayName + "' in organization '" + organization + "'. Status: "
-                            + response.statusCode() + ". Response: " + response.body());
+                    "Failed to create team '%s' in organization '%s'. Status: %d. Response: %s",
+                    teamDisplayName, organization, response.statusCode(), response.body());
         }
     }
 
@@ -111,8 +111,8 @@ public final class GithubConnectionImpl implements GithubConnection {
                 return;
 
             throw new RejectedOperationException(
-                    "Failed to delete team (slug) '" + teamSlug + "' in organization '" + organization + "'. Status: "
-                            + response.statusCode() + ". Response: " + response.body());
+                    "Failed to delete team (slug) '%s' in organization '%s'. Status: %d. Response: %s",
+                    teamSlug, organization, response.statusCode(), response.body());
         }
     }
 
@@ -122,8 +122,8 @@ public final class GithubConnectionImpl implements GithubConnection {
 
         try (HttpClient client = HttpClient.newHttpClient()) {
 
-            String url = String.format("https://api.github.com/orgs/%s/teams/%s/memberships/%s", organization,
-                    teamSlug, githubUsername);
+            String url = String.format("https://api.github.com/orgs/%s/teams/%s/memberships/%s",
+                    organization, teamSlug, githubUsername);
             HttpRequest request = createHttpRequestBuilder(url)
                     .PUT(HttpRequest.BodyPublishers.noBody())
                     .build();
@@ -135,9 +135,8 @@ public final class GithubConnectionImpl implements GithubConnection {
                 return;
 
             throw new RejectedOperationException(
-                    "Failed to add user '" + githubUsername + "' to team (slug) '" + teamSlug + "' in organization '"
-                            + organization + "'. Status: "
-                            + response.statusCode() + ". Response: " + response.body());
+                    "Failed to add user '%s' to team (slug) '%s' in organization '%s'. Status: %d. Response: %s",
+                    githubUsername, teamSlug, organization, response.statusCode(), response.body());
         }
     }
 
@@ -160,9 +159,8 @@ public final class GithubConnectionImpl implements GithubConnection {
                 return;
 
             throw new RejectedOperationException(
-                    "Failed to remove user '" + githubUsername + "' from team (slug) '" + teamSlug
-                            + "' in organization '" + organization + "'. Status: "
-                            + response.statusCode() + ". Response: " + response.body());
+                    "Failed to remove user '%s' from team (slug) '%s' in organization '%s'. Status: %d. Response: %s",
+                    githubUsername, teamSlug, organization, response.statusCode(), response.body());
         }
     }
 
@@ -180,9 +178,9 @@ public final class GithubConnectionImpl implements GithubConnection {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
-                throw new RejectedOperationException("Failed to get team members for organization '" + organization
-                        + "'. Status: " + response.statusCode()
-                        + ". Response: " + response.body());
+                throw new RejectedOperationException(
+                        "Failed to get team members for organization '%s'. Status: %d. Response: %s",
+                        organization, response.statusCode(), response.body());
             }
 
             ObjectMapper mapper = new ObjectMapper();
@@ -190,17 +188,54 @@ public final class GithubConnectionImpl implements GithubConnection {
 
             if (!root.isArray())
                 throw new UnexpectedFormatException(
-                        "Expected a JSON array for team members, got: " + root.getNodeType());
+                        "Expected a JSON array for team members, got: %s", root.getNodeType());
 
             for (JsonNode node : root) {
                 JsonNode loginNode = node.get("login");
                 if (loginNode == null || !loginNode.isTextual())
                     throw new UnexpectedFormatException(
-                            "Expected 'login' field of type string in each member object, got: " + node.toString());
+                            "Expected 'login' field of type string in each member object, got: %s", node);
 
                 members.add(loginNode.asText());
             }
             return members;
+        }
+    }
+
+    @Override
+    public List<String> getTeamInvitations(String organization, String teamSlug)
+            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+
+        List<String> invites = new ArrayList<>();
+
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            String url = String.format("https://api.github.com/orgs/%s/teams/%s/invitations", organization, teamSlug);
+            HttpRequest request = createHttpRequestBuilder(url).build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new RejectedOperationException(
+                        "Failed to get team invitations for organization '%s'. Status: %d. Response: %s",
+                        organization, response.statusCode(), response.body());
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.body());
+
+            if (!root.isArray())
+                throw new UnexpectedFormatException(
+                        "Expected a JSON array for team invitations, got: %s", root.getNodeType());
+
+            for (JsonNode node : root) {
+                JsonNode inviteeLogin = node.get("login");
+                if (!inviteeLogin.isTextual())
+                    throw new UnexpectedFormatException(
+                            "Expected 'login' field of type string in each invitation object, got: %s", node);
+
+                invites.add(inviteeLogin.asText());
+            }
+            return invites;
         }
     }
 

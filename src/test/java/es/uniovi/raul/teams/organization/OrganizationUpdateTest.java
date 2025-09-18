@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -34,8 +35,10 @@ class OrganizationUpdateTest {
                 .thenReturn(List.of(
                         new Team("group A", "group-a"),
                         new Team("group B", "group-b")));
-        when(github.getTeamMembers("org", "group-a")).thenReturn(List.of());
-        when(github.getTeamMembers("org", "group-b")).thenReturn(List.of());
+        when(github.getTeamMembers("org", "group-a")).thenReturn(new ArrayList<>());
+        when(github.getTeamMembers("org", "group-b")).thenReturn(new ArrayList<>());
+        when(github.getTeamInvitations("org", "group-a")).thenReturn(new ArrayList<>());
+        when(github.getTeamInvitations("org", "group-b")).thenReturn(new ArrayList<>());
         when(github.createTeam("org", "group A")).thenReturn(of("group-a"));
         when(github.createTeam("org", "group B")).thenReturn(of("group-b"));
 
@@ -53,6 +56,8 @@ class OrganizationUpdateTest {
 
         verify(github, times(1)).getTeamMembers("org", "group-a");
         verify(github, times(1)).getTeamMembers("org", "group-b");
+        verify(github, times(1)).getTeamInvitations("org", "group-a");
+        verify(github, times(1)).getTeamInvitations("org", "group-b");
         verify(github, times(1)).inviteStudentToTeam("org", "group-a", "alice");
         verify(github, times(1)).inviteStudentToTeam("org", "group-a", "bob");
         verify(github, times(1)).inviteStudentToTeam("org", "group-b", "carol");
@@ -87,8 +92,10 @@ class OrganizationUpdateTest {
                 .thenReturn(List.of(teamA, teamB));
 
         // No members initially
-        when(github.getTeamMembers("org", "group-a")).thenReturn(List.of());
-        when(github.getTeamMembers("org", "group-b")).thenReturn(List.of());
+        when(github.getTeamMembers("org", "group-a")).thenReturn(new ArrayList<>());
+        when(github.getTeamMembers("org", "group-b")).thenReturn(new ArrayList<>());
+        when(github.getTeamInvitations("org", "group-a")).thenReturn(new ArrayList<>());
+        when(github.getTeamInvitations("org", "group-b")).thenReturn(new ArrayList<>());
 
         // Create B, keep A, delete C
         when(github.createTeam("org", "group B")).thenReturn(of("group-b"));
@@ -113,6 +120,8 @@ class OrganizationUpdateTest {
         // Member sync for A and B
         verify(github, times(1)).getTeamMembers("org", "group-a");
         verify(github, times(1)).getTeamMembers("org", "group-b");
+        verify(github, times(1)).getTeamInvitations("org", "group-a");
+        verify(github, times(1)).getTeamInvitations("org", "group-b");
         verify(github, times(1)).inviteStudentToTeam("org", "group-a", "alice");
         verify(github, times(1)).inviteStudentToTeam("org", "group-b", "bob");
 
@@ -133,8 +142,10 @@ class OrganizationUpdateTest {
                 .thenReturn(List.of(teamA, teamB));
 
         // Initial members: A has bob (to remove), B has carol (kept)
-        when(github.getTeamMembers("org", "group-a")).thenReturn(List.of("bob"));
-        when(github.getTeamMembers("org", "group-b")).thenReturn(List.of("carol"));
+        when(github.getTeamMembers("org", "group-a")).thenReturn(new ArrayList<>(List.of("bob")));
+        when(github.getTeamMembers("org", "group-b")).thenReturn(new ArrayList<>(List.of("carol")));
+        when(github.getTeamInvitations("org", "group-a")).thenReturn(new ArrayList<>());
+        when(github.getTeamInvitations("org", "group-b")).thenReturn(new ArrayList<>());
 
         var organization = new Organization("org", github);
         // Desired: A -> alice, B -> carol
@@ -154,6 +165,8 @@ class OrganizationUpdateTest {
         // Member sync: add alice to A, remove bob from A; B unchanged
         verify(github, times(1)).getTeamMembers("org", "group-a");
         verify(github, times(1)).getTeamMembers("org", "group-b");
+        verify(github, times(1)).getTeamInvitations("org", "group-a");
+        verify(github, times(1)).getTeamInvitations("org", "group-b");
         verify(github, times(1)).inviteStudentToTeam("org", "group-a", "alice");
         verify(github, times(1)).removeStudentFromTeam("org", "group-a", "bob");
 

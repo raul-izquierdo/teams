@@ -116,22 +116,22 @@ public final class Organization {
     private void updateTeamMembers(GroupTeam team, List<Student> students)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        // Invite missing students
-        List<String> existingMembersLogin = githubApi.getTeamMembers(organizationName, team.slug());
+        List<String> alreadyInvited = githubApi.getTeamMembers(organizationName, team.slug());
+        alreadyInvited.addAll(githubApi.getTeamInvitations(organizationName, team.slug()));
+
         for (var student : students)
-            if (!existingMembersLogin.contains(student.login())) {
+            if (!alreadyInvited.contains(student.login())) {
                 githubApi.inviteStudentToTeam(organizationName, team.slug(), student.login());
                 logger.log(format("[Invited student] '%s' to team '%s'", student.name(), team.displayName()));
             }
 
         // Remove extra members
         List<String> studentsLogin = students.stream().map(Student::login).toList();
-        for (String existingLogin : existingMembersLogin)
+        for (String existingLogin : alreadyInvited)
             if (!studentsLogin.contains(existingLogin)) {
                 githubApi.removeStudentFromTeam(organizationName, team.slug(), existingLogin);
                 logger.log(format("[Removed student] '%s' from team '%s'", existingLogin, team.displayName()));
             }
-
     }
 
     private void lookForNewTeams(List<String> groups, List<GroupTeam> existingTeams)
