@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [2.1.0]
+
+### Added
+- Messages to remind that users need to accept invitations to join teams.
+- Students with pending invitations are now considered existing members, so they won't be invited again.
+- The files names are printed for the user to know which files are being processed.
+
+### Changed
+
+- Error messages now include the organization name for better clarity.
+
 ## [2.0.0]
 
 ### Added
