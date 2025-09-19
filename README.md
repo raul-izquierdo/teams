@@ -2,7 +2,7 @@
 
 ## Objective
 
-This application manages teams and their members in a GitHub organization. These teams are used, along with other tools, to assign or display repositories by student groups.
+This application manages teams and their members in a GitHub organization. These teams are used, along with other tools, to grant access to repositories by student groups.
 
 > **NOTE**: This application is **part of a toolkit** for managing classes with GitHub Classroom. It is recommended to **first read** the [main repository](https://github.com/raul-izquierdo/classroom-tools) to get an overview of the project and understand where this tool fits.
 
@@ -29,8 +29,6 @@ After running `teams.jar`, the teams in the organization and their members will 
 Note that after running this tool, students still **need to accept their email invitations** to join the team.
 
 Students with a **pending invitation** are considered existing team members, so they will not be invited again. This is useful when a student has not yet accepted their invitation but the team needs to be updated to add or remove other students.
-
-
 
 ### 2. End-of-semester cleanup
 
