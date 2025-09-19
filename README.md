@@ -54,7 +54,7 @@ java -jar teams.jar [<csvfile>] [-o <organization>] [-t <token>] [--clean]
 | Option              | Description                                                                                                                            |
 | ------------------- | ------------------------------------------------------------------------------------------- |
 | `<csvfile>`         | The roster CSV file downloaded from GitHub Classroom (default: `classroom_roster.csv`). See [Obtaining the Roster File](https://github.com/raul-izquierdo/classroom-tools#obtaining-the-roster-file) for instructions on how to obtain this file.                                                |
-| `-o <organization>` | GitHub organization name.                                                                                                              |
+| `-o <organization>` | GitHub organization that contains the solutions                                                                                                              |
 | `-t <token>`        | GitHub API access token. See [Obtaining the GitHub Token](https://github.com/raul-izquierdo/classroom-tools#obtaining-the-github-token).                                                                                                               |
 | `--clean`           | Remove all group teams from the organization (useful for a new academic semester).                                                     |
 
@@ -63,6 +63,8 @@ If `-o` or `-t` are not provided, the app tries to read the `GITHUB_ORG` and `GI
 GITHUB_ORG=<your-org>
 GITHUB_TOKEN=<token>
 ```
+
+**Note:** The required organization is the one that contains the solution repositories. Depending on your preferences, this may differ from the organization linked to GitHub Classroom. Some instructors prefer to store solutions in a separate organization from the one used for assignments (which is my recommendation). In this case, be sure to specify the organization containing the solutions here.
 
 ## Generated Team Names for Groups
 
