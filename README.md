@@ -32,13 +32,13 @@ Students with a **pending invitation** are considered existing team members, so 
 
 ### 2. End-of-semester cleanup
 
-When the course ends, delete the teams corresponding to groups to prepare for a new semester:
+When the course ends, clean the organization to prepare for a new semester. The following command removes all group teams and also removes from the organization any users who belonged to those teams (including users with pending invitations to those teams):
 
 ```bash
 java -jar teams.jar --clean -t <token> -o <organization>
 ```
 
-This command will delete all teams created from groups (but will not affect other teams in the organization).
+Note that other non-group teams and their members are preserved.
 
 
 ## Usage

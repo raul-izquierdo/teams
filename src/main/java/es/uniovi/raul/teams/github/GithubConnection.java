@@ -36,6 +36,10 @@ public interface GithubConnection {
      * Removes a team from the specified organization.
      * If the team already exists, it returns an empty Optional.
      *
+     * Notes:
+     * - Deleting a team does not remove its members from the organization account itself.
+     * - Any pending invitations to that team are effectively invalidated when the team no longer exists.
+     *
      * @param organization   Organization name
      * @param teamSlug       Slug of the team to remove
      * @throws RejectedOperationException if the operation is rejected by GitHub API
@@ -45,11 +49,12 @@ public interface GithubConnection {
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException;
 
     /**
-     * Invites a student to a team in the specified organization.
+     * Invites (adds) a student to a team in the specified organization.
      * <p>
-     * If the operation is successful (student is invited or already a member), the method returns normally.
+     * Behavior is idempotent: if the student is already a member, or already has a pending team invitation,
+     * the API returns success and no additional action is required.
+     * <p>
      * If the operation is rejected by the GitHub API, a {@link RejectedOperationException} is thrown.
-     * <p>
      *
      * @param organization   Organization name
      * @param teamSlug       Slug of the team to which the student will be invited
@@ -64,9 +69,12 @@ public interface GithubConnection {
     /**
     * Removes a student from a team in the specified organization.
     * <p>
-    * If the operation is successful (student is removed or was not a member), the method returns normally.
+    * If the operation is successful (student is removed or was not a member/invitee), the method returns normally.
     * If the operation is rejected by the GitHub API, a {@link RejectedOperationException} is thrown.
     * <p>
+    * Notes:
+    * - Removing a student from a team does not remove them from the organization.
+    * - If the user had a pending team invitation, the removal is treated as success and the invitation is no longer applicable.
     *
     * @param organization   Organization name
     * @param teamSlug       Slug of the team from which the student will be removed
@@ -79,7 +87,8 @@ public interface GithubConnection {
             throws RejectedOperationException, IOException, InterruptedException;
 
     /**
-    * Returns a list of GitHub usernames (logins) for the members of a given team in the specified organization.
+    * Returns a list of GitHub usernames (logins) for the accepted members of a given team in the specified organization.
+    * Pending team invitations are not included here.
     *
     * @param organization Organization name
     * @param teamSlug     Slug of the team
@@ -94,7 +103,7 @@ public interface GithubConnection {
 
     /**
     * Returns a list of GitHub usernames (logins) that have a pending invitation to the given team.
-    * This allows callers to decide whether to treat pending invitations as members or not.
+    * These are team-level invitations, not organization-level invitations.
     *
     * @param organization Organization name
     * @param teamSlug     Slug of the team
@@ -106,6 +115,28 @@ public interface GithubConnection {
     */
     List<String> getTeamInvitations(String organization, String teamSlug)
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException;
+
+    /**
+     * Removes a user from the given organization (accepted members only).
+     * <p>
+     * Behavior:
+     * - Idempotent: if the user is not an accepted member (e.g., only invited), the call is treated as success but
+     *   it does not cancel any existing organization-level invitation.
+     * - This method does not manage team invitations. Pending team invitations become irrelevant if the
+     *   corresponding team is deleted.
+     * - This method does not cancel organization-level invitations. If you need to revoke standalone org invites,
+     *   that must be handled via the org invitations API (not exposed here).
+     *
+     * @param organization Organization name
+     * @param githubUsername GitHub username of the user to remove
+     * @throws RejectedOperationException if the operation is rejected by GitHub API
+     * @throws IOException if a network error occurs
+     * @throws InterruptedException if the operation is interrupted
+     */
+    void removeMemberFromOrganization(String organization, String githubUsername)
+            throws RejectedOperationException, IOException, InterruptedException;
+
+    // Note: Organization-level invitations are not required for the cleanup flow.
 
     /**
     * Exception thrown when the response format is unexpected. Probably the format has changed and this code needs to be updated.

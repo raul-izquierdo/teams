@@ -4,7 +4,7 @@ import picocli.CommandLine.*;
 
 // CHECKSTYLE:OFF
 
-@Command(name = "teams", version = "2.1.0", showDefaultValues = true, mixinStandardHelpOptions = true, usageHelpAutoWidth = true, description = Messages.DESCRIPTION, footer = Messages.CREDITS)
+@Command(name = "teams", version = "2.2.0", showDefaultValues = true, mixinStandardHelpOptions = true, usageHelpAutoWidth = true, description = Messages.DESCRIPTION, footer = Messages.CREDITS)
 public class Arguments {
 
     @ArgGroup(exclusive = true) // multiplicity = "1" means exactly one required
@@ -14,7 +14,7 @@ public class Arguments {
         @Parameters(index = "0", defaultValue = "classroom_roster.csv", description = "The roster CSV file downloaded from GitHub Classroom. Cannot be used together with '--clean'.")
         public String rosterFile;
 
-        @Option(names = "--clean", description = "Remove all teams derived from groups (other teams in the organization will be preserved). Cannot be used together with <rosterFile>.")
+        @Option(names = "--clean", description = "Remove all teams derived from groups and its members from the organization (other teams in the organization will be preserved). Cannot be used together with <rosterFile>.")
         public boolean cleanTeams;
     }
 

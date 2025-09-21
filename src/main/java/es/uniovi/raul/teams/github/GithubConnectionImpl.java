@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.*;
  */
 public final class GithubConnectionImpl implements GithubConnection {
 
+    private static final String JSON_LOGIN = "login";
     private String token;
 
     public GithubConnectionImpl(String token) {
@@ -191,7 +192,7 @@ public final class GithubConnectionImpl implements GithubConnection {
                         "Expected a JSON array for team members, got: %s", root.getNodeType());
 
             for (JsonNode node : root) {
-                JsonNode loginNode = node.get("login");
+                JsonNode loginNode = node.get(JSON_LOGIN);
                 if (loginNode == null || !loginNode.isTextual())
                     throw new UnexpectedFormatException(
                             "Expected 'login' field of type string in each member object, got: %s", node);
@@ -228,7 +229,7 @@ public final class GithubConnectionImpl implements GithubConnection {
                         "Expected a JSON array for team invitations, got: %s", root.getNodeType());
 
             for (JsonNode node : root) {
-                JsonNode inviteeLogin = node.get("login");
+                JsonNode inviteeLogin = node.get(JSON_LOGIN);
                 if (!inviteeLogin.isTextual())
                     throw new UnexpectedFormatException(
                             "Expected 'login' field of type string in each invitation object, got: %s", node);
@@ -236,6 +237,30 @@ public final class GithubConnectionImpl implements GithubConnection {
                 invites.add(inviteeLogin.asText());
             }
             return invites;
+        }
+    }
+
+    // Organization-level membership and invitations ---------------------------------
+
+    @Override
+    public void removeMemberFromOrganization(String organization, String githubUsername)
+            throws RejectedOperationException, IOException, InterruptedException {
+
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            String url = String.format("https://api.github.com/orgs/%s/members/%s", organization, githubUsername);
+            HttpRequest request = createHttpRequestBuilder(url)
+                    .DELETE()
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            // 204 No Content: removed; 404 Not Found: not a member; both treated as success
+            if (response.statusCode() == 204 || response.statusCode() == 404)
+                return;
+
+            throw new RejectedOperationException(
+                    "Failed to remove user '%s' from organization '%s'. Status: %d. Response: %s",
+                    githubUsername, organization, response.statusCode(), response.body());
         }
     }
 

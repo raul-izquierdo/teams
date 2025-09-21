@@ -74,8 +74,35 @@ public final class Organization {
      */
     public void deleteGroupTeams()
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+        var groupTeams = getGroupTeams();
+        if (groupTeams.isEmpty())
+            return;
 
-        for (var team : getGroupTeams()) {
+        // Collect all usernames that belong to any group team (members and pending invitations)
+        var usernamesToRemove = new java.util.HashSet<String>();
+
+        for (var team : groupTeams) {
+            var members = githubApi.getTeamMembers(organizationName, team.slug());
+            usernamesToRemove.addAll(members);
+
+            var invites = githubApi.getTeamInvitations(organizationName, team.slug());
+            usernamesToRemove.addAll(invites);
+        }
+
+        // Remove users from the organization (idempotent if already not members)
+        for (var login : usernamesToRemove) {
+            try {
+                githubApi.removeMemberFromOrganization(organizationName, login);
+                logger.log(String.format("[Removed member from org] '%s'", login));
+            } catch (RejectedOperationException e) {
+                logger.log(String.format("[WARNING] Could not remove member '%s' from organization '%s': %s",
+                        login, organizationName, e.getMessage()));
+                // Continue with next member
+            }
+        }
+
+        // Finally, delete all group teams
+        for (var team : groupTeams) {
             githubApi.deleteTeam(organizationName, team.slug());
             logger.log("[Deleted team] " + team.displayName());
         }
@@ -129,8 +156,14 @@ public final class Organization {
         List<String> studentsLogin = students.stream().map(Student::login).toList();
         for (String existingLogin : alreadyInvited)
             if (!studentsLogin.contains(existingLogin)) {
-                githubApi.removeStudentFromTeam(organizationName, team.slug(), existingLogin);
-                logger.log(format("[Removed student] '%s' from team '%s'", existingLogin, team.displayName()));
+                try {
+                    githubApi.removeStudentFromTeam(organizationName, team.slug(), existingLogin);
+                    logger.log(format("[Removed student] '%s' from team '%s'", existingLogin, team.displayName()));
+                } catch (RejectedOperationException e) {
+                    logger.log(format("[WARNING] Could not remove '%s' from team '%s': %s",
+                            existingLogin, team.displayName(), e.getMessage()));
+                    // Continue with next member
+                }
             }
     }
 
