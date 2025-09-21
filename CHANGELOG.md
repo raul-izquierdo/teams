@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [2.2.0]
+
+### Added
+- Removing the teams now also removes from the organization any users who belonged to those teams (including users with pending invitations to those teams).
+
 ## [2.1.0]
 
 ### Added
