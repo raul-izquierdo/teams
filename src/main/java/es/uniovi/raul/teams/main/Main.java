@@ -41,8 +41,8 @@ public class Main {
 
     }
 
-    private static void run(Arguments arguments) throws UnexpectedFormatException,
-            RejectedOperationException, IOException, InterruptedException, InvalidRosterFormatException {
+    private static void run(Arguments arguments) throws GithubApiException,
+            IOException, InterruptedException, InvalidRosterFormatException {
 
         GithubApi connection = new GithubApiImpl(arguments.token);
         if (arguments.dryRun) {

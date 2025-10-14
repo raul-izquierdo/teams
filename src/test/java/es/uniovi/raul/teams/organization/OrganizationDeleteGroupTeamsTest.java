@@ -22,7 +22,7 @@ class OrganizationDeleteGroupTeamsTest {
 
     @Test
     void deletes_only_group_teams()
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApi.GithubApiException, IOException, InterruptedException {
 
         when(github.getTeams("org")).thenReturn(List.of(
                 new Team("group A", "group-a"),
@@ -50,7 +50,7 @@ class OrganizationDeleteGroupTeamsTest {
 
     @Test
     void no_group_teams_deleted()
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApi.GithubApiException, IOException, InterruptedException {
 
         when(github.getTeams("org")).thenReturn(Collections.emptyList());
 
@@ -64,7 +64,7 @@ class OrganizationDeleteGroupTeamsTest {
 
     @Test
     void propagates_errors_from_api()
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApi.GithubApiException, IOException, InterruptedException {
 
         when(github.getTeams("org")).thenThrow(new GithubApi.UnexpectedFormatException("boom"));
 
@@ -75,7 +75,7 @@ class OrganizationDeleteGroupTeamsTest {
 
     @Test
     void deletes_group_teams_and_removes_members()
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApi.GithubApiException, IOException, InterruptedException {
 
         when(github.getTeams("org")).thenReturn(List.of(
                 new Team("group A", "group-a"),
@@ -105,7 +105,7 @@ class OrganizationDeleteGroupTeamsTest {
 
     @Test
     void continues_when_removal_fails_for_some_users()
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApi.GithubApiException, IOException, InterruptedException {
 
         when(github.getTeams("org")).thenReturn(List.of(
                 new Team("group A", "group-a")));

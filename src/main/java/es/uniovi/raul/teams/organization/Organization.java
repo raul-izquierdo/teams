@@ -53,7 +53,7 @@ public final class Organization {
      * @throws InterruptedException if the operation is interrupted
      */
     public void updateWith(List<Student> students)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         updateTeams(students.stream()
                 .map(Student::group)
@@ -73,7 +73,7 @@ public final class Organization {
      * @throws InterruptedException if the operation is interrupted.
      */
     public void deleteGroupTeams()
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
         var groupTeams = getGroupTeams();
         if (groupTeams.isEmpty())
             return;
@@ -116,7 +116,7 @@ public final class Organization {
      * Only teams that correspond to groups teams (follow the naming convention) will be removed.
      */
     private void updateTeams(List<String> requiredGroups)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         var existingTeams = getGroupTeams();
         lookForNewTeams(requiredGroups, existingTeams);
@@ -127,7 +127,7 @@ public final class Organization {
      * Updates the members of each team based on the provided list of students.
      */
     private void updateTeamsMembers(List<Student> students)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         for (var team : getGroupTeams()) {
 
@@ -141,7 +141,7 @@ public final class Organization {
     }
 
     private void updateTeamMembers(GroupTeam team, List<Student> students)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         List<String> alreadyInvited = githubApi.getTeamMembers(organizationName, team.slug());
         alreadyInvited.addAll(githubApi.getTeamInvitations(organizationName, team.slug()));
@@ -168,7 +168,7 @@ public final class Organization {
     }
 
     private void lookForNewTeams(List<String> groups, List<GroupTeam> existingTeams)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         List<String> teamsToCreate = groups.stream()
                 .map(TeamNaming::toTeam)
@@ -183,7 +183,7 @@ public final class Organization {
     }
 
     private void lookForTeamsToRemove(List<String> groups, List<GroupTeam> existingTeams)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         List<GroupTeam> teamsToRemove = existingTeams.stream()
                 .filter(team -> groups.stream().noneMatch(team::isAssociatedWith))
@@ -197,7 +197,7 @@ public final class Organization {
 
     // Only return the teams that correspond to groups
     private List<GroupTeam> getGroupTeams()
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         return githubApi.getTeams(organizationName).stream()
                 .filter(team -> isGroupTeam(team.displayName()))

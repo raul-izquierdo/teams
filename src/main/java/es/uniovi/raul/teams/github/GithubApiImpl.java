@@ -35,7 +35,7 @@ public final class GithubApiImpl implements GithubApi {
 
     @Override
     public List<Team> getTeams(String organization)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         List<Team> teams = new ArrayList<>();
         String url = "https://api.github.com/orgs/" + organization + "/teams";
@@ -67,7 +67,7 @@ public final class GithubApiImpl implements GithubApi {
 
     @Override
     public Optional<String> createTeam(String organization, String teamDisplayName)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         String url = "https://api.github.com/orgs/" + organization + "/teams";
         String json = String.format("{\"name\":\"%s\",\"privacy\":\"closed\"}", teamDisplayName);
@@ -99,7 +99,7 @@ public final class GithubApiImpl implements GithubApi {
 
     @Override
     public void deleteTeam(String organization, String teamSlug)
-            throws IOException, InterruptedException, RejectedOperationException {
+            throws IOException, InterruptedException, GithubApiException {
 
         String url = String.format("https://api.github.com/orgs/%s/teams/%s", organization, teamSlug);
         HttpRequest request = createHttpRequestBuilder(url)
@@ -119,7 +119,7 @@ public final class GithubApiImpl implements GithubApi {
 
     @Override
     public void inviteStudentToTeam(String organization, String teamSlug, String githubUsername)
-            throws RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         String url = String.format("https://api.github.com/orgs/%s/teams/%s/memberships/%s",
                 organization, teamSlug, githubUsername);
@@ -140,7 +140,7 @@ public final class GithubApiImpl implements GithubApi {
 
     @Override
     public void removeStudentFromTeam(String organization, String teamSlug, String githubUsername)
-            throws RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         String url = String.format("https://api.github.com/orgs/%s/teams/%s/memberships/%s", organization,
                 teamSlug, githubUsername);
@@ -161,7 +161,7 @@ public final class GithubApiImpl implements GithubApi {
 
     @Override
     public List<String> getTeamMembers(String organization, String teamSlug)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         List<String> members = new ArrayList<>();
         String url = String.format("https://api.github.com/orgs/%s/teams/%s/members", organization, teamSlug);
@@ -194,7 +194,7 @@ public final class GithubApiImpl implements GithubApi {
 
     @Override
     public List<String> getTeamInvitations(String organization, String teamSlug)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         List<String> invites = new ArrayList<>();
         String url = String.format("https://api.github.com/orgs/%s/teams/%s/invitations", organization, teamSlug);
@@ -228,7 +228,7 @@ public final class GithubApiImpl implements GithubApi {
 
     @Override
     public void removeMemberFromOrganization(String organization, String githubUsername)
-            throws RejectedOperationException, IOException, InterruptedException {
+            throws GithubApiException, IOException, InterruptedException {
 
         String url = String.format("https://api.github.com/orgs/%s/members/%s", organization, githubUsername);
         HttpRequest request = createHttpRequestBuilder(url)

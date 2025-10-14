@@ -17,7 +17,7 @@ public interface GithubApi {
      * @throws UnexpectedFormatException if the response format is unexpected
      */
     List<Team> getTeams(String organization)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException;
+            throws GithubApiException, IOException, InterruptedException;
 
     /**
      * Creates a new team in the specified organization with the given display name.
@@ -30,7 +30,7 @@ public interface GithubApi {
      * @throws UnexpectedFormatException if the response format is unexpected
      */
     Optional<String> createTeam(String organization, String teamDisplayName)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException;
+            throws GithubApiException, IOException, InterruptedException;
 
     /**
      * Removes a team from the specified organization.
@@ -46,7 +46,7 @@ public interface GithubApi {
      * @throws UnexpectedFormatException if the response format is unexpected
      */
     void deleteTeam(String organization, String teamSlug)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException;
+            throws GithubApiException, IOException, InterruptedException;
 
     /**
      * Invites (adds) a student to a team in the specified organization.
@@ -64,7 +64,7 @@ public interface GithubApi {
      * @throws InterruptedException if the operation is interrupted
      */
     void inviteStudentToTeam(String organization, String teamSlug, String githubUsername)
-            throws RejectedOperationException, IOException, InterruptedException;
+            throws GithubApiException, IOException, InterruptedException;
 
     /**
     * Removes a student from a team in the specified organization.
@@ -84,7 +84,7 @@ public interface GithubApi {
     * @throws InterruptedException if the operation is interrupted
     */
     void removeStudentFromTeam(String organization, String teamSlug, String githubUsername)
-            throws RejectedOperationException, IOException, InterruptedException;
+            throws GithubApiException, IOException, InterruptedException;
 
     /**
     * Returns a list of GitHub usernames (logins) for the accepted members of a given team in the specified organization.
@@ -99,7 +99,7 @@ public interface GithubApi {
     * @throws InterruptedException if the operation is interrupted
     */
     List<String> getTeamMembers(String organization, String teamSlug)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException;
+            throws GithubApiException, IOException, InterruptedException;
 
     /**
     * Returns a list of GitHub usernames (logins) that have a pending invitation to the given team.
@@ -114,7 +114,7 @@ public interface GithubApi {
     * @throws InterruptedException if the operation is interrupted
     */
     List<String> getTeamInvitations(String organization, String teamSlug)
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException;
+            throws GithubApiException, IOException, InterruptedException;
 
     /**
      * Removes a user from the given organization (accepted members only).
@@ -134,14 +134,25 @@ public interface GithubApi {
      * @throws InterruptedException if the operation is interrupted
      */
     void removeMemberFromOrganization(String organization, String githubUsername)
-            throws RejectedOperationException, IOException, InterruptedException;
+            throws GithubApiException, IOException, InterruptedException;
 
-    // Note: Organization-level invitations are not required for the cleanup flow.
+    /**
+     * Base exception for all GitHub API-related errors.
+     */
+    class GithubApiException extends Exception {
+        public GithubApiException(String message) {
+            super(message);
+        }
+
+        public GithubApiException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
 
     /**
     * Exception thrown when the response format is unexpected. Probably the format has changed and this code needs to be updated.
     */
-    class UnexpectedFormatException extends Exception {
+    class UnexpectedFormatException extends GithubApiException {
         public UnexpectedFormatException(String message) {
             super(message);
         }
@@ -149,13 +160,12 @@ public interface GithubApi {
         public UnexpectedFormatException(String format, Object... args) {
             super(String.format(format, args));
         }
-
     }
 
     /**
     * Exception thrown when the operation is rejected by GitHub API.
     */
-    class RejectedOperationException extends Exception {
+    class RejectedOperationException extends GithubApiException {
         public RejectedOperationException(String message) {
             super(message);
         }

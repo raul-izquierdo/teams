@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import es.uniovi.raul.teams.github.GithubApi;
-import es.uniovi.raul.teams.github.GithubApi.RejectedOperationException;
 import es.uniovi.raul.teams.github.GithubApi.UnexpectedFormatException;
 import es.uniovi.raul.teams.github.Team;
 import es.uniovi.raul.teams.roster.Student;
@@ -27,7 +26,7 @@ class OrganizationUpdateTest {
 
     @Test
     void update_creates_teams_and_syncs_members()
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApi.GithubApiException, IOException, InterruptedException {
 
         // Establecer lo que tiene que simular devolver cada método de la conexión cuando se les llame
         when(github.getTeams("org"))
@@ -68,7 +67,7 @@ class OrganizationUpdateTest {
 
     @Test
     void update_propagates_errors()
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApi.GithubApiException, IOException, InterruptedException {
 
         when(github.getTeams("org")).thenThrow(new UnexpectedFormatException("boom"));
 
@@ -79,7 +78,7 @@ class OrganizationUpdateTest {
 
     @Test
     void update_creates_missing_and_deletes_extra_group_teams()
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApi.GithubApiException, IOException, InterruptedException {
 
         var teamA = new Team("group A", "group-a");
         var teamB = new Team("group B", "group-b");
@@ -131,7 +130,7 @@ class OrganizationUpdateTest {
 
     @Test
     void update_syncs_members_adds_and_removes()
-            throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
+            throws GithubApi.GithubApiException, IOException, InterruptedException {
 
         var teamA = new Team("group A", "group-a");
         var teamB = new Team("group B", "group-b");
