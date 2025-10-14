@@ -12,13 +12,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import es.uniovi.raul.teams.github.*;
-import es.uniovi.raul.teams.github.GithubConnection.*;
+import es.uniovi.raul.teams.github.GithubApi.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrganizationDeleteGroupTeamsTest {
 
     @Mock
-    private GithubConnection github;
+    private GithubApi github;
 
     @Test
     void deletes_only_group_teams()
@@ -66,7 +66,7 @@ class OrganizationDeleteGroupTeamsTest {
     void propagates_errors_from_api()
             throws UnexpectedFormatException, RejectedOperationException, IOException, InterruptedException {
 
-        when(github.getTeams("org")).thenThrow(new GithubConnection.UnexpectedFormatException("boom"));
+        when(github.getTeams("org")).thenThrow(new GithubApi.UnexpectedFormatException("boom"));
 
         var organization = new Organization("org", github);
 
@@ -114,7 +114,7 @@ class OrganizationDeleteGroupTeamsTest {
         when(github.getTeamInvitations("org", "group-a")).thenReturn(List.of());
 
         // Simulate failure removing org owner, success for student
-        doThrow(new GithubConnection.RejectedOperationException("Cannot remove organization owner"))
+        doThrow(new GithubApi.RejectedOperationException("Cannot remove organization owner"))
                 .when(github).removeMemberFromOrganization("org", "owner");
 
         var organization = new Organization("org", github);

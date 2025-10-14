@@ -13,9 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import es.uniovi.raul.teams.github.GithubConnection;
-import es.uniovi.raul.teams.github.GithubConnection.RejectedOperationException;
-import es.uniovi.raul.teams.github.GithubConnection.UnexpectedFormatException;
+import es.uniovi.raul.teams.github.GithubApi;
+import es.uniovi.raul.teams.github.GithubApi.RejectedOperationException;
+import es.uniovi.raul.teams.github.GithubApi.UnexpectedFormatException;
 import es.uniovi.raul.teams.github.Team;
 import es.uniovi.raul.teams.roster.Student;
 
@@ -23,7 +23,7 @@ import es.uniovi.raul.teams.roster.Student;
 class OrganizationUpdateTest {
 
     @Mock
-    private GithubConnection github;
+    private GithubApi github;
 
     @Test
     void update_creates_teams_and_syncs_members()

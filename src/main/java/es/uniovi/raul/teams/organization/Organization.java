@@ -6,8 +6,8 @@ import static java.lang.String.*;
 import java.io.IOException;
 import java.util.List;
 
-import es.uniovi.raul.teams.github.GithubConnection;
-import es.uniovi.raul.teams.github.GithubConnection.*;
+import es.uniovi.raul.teams.github.GithubApi;
+import es.uniovi.raul.teams.github.GithubApi.*;
 import es.uniovi.raul.teams.roster.Student;
 
 /**
@@ -17,14 +17,14 @@ import es.uniovi.raul.teams.roster.Student;
 public final class Organization {
 
     private String organizationName;
-    private GithubConnection githubApi;
+    private GithubApi githubApi;
     private Logger logger;
 
-    public Organization(String organizationName, GithubConnection githubApi) {
+    public Organization(String organizationName, GithubApi githubApi) {
         this(organizationName, githubApi, new ConsoleLogger());
     }
 
-    public Organization(String organizationName, GithubConnection githubApi, Logger logger) {
+    public Organization(String organizationName, GithubApi githubApi, Logger logger) {
         if (githubApi == null)
             throw new IllegalArgumentException("GithubApi cannot be null.");
         if (organizationName == null || organizationName.isBlank())

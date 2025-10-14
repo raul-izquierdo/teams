@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import es.uniovi.raul.teams.github.GithubConnection;
+import es.uniovi.raul.teams.github.GithubApi;
 import es.uniovi.raul.teams.github.Team;
 import es.uniovi.raul.teams.roster.Student;
 
@@ -19,7 +19,7 @@ import es.uniovi.raul.teams.roster.Student;
 class OrganizationUpdateTeamMembersTest {
 
     @Mock
-    private GithubConnection githubApi;
+    private GithubApi githubApi;
 
     @Mock
     private Logger logger;

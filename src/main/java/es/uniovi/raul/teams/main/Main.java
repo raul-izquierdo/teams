@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Optional;
 
 import es.uniovi.raul.teams.cli.*;
-import es.uniovi.raul.teams.github.GithubConnection.*;
-import es.uniovi.raul.teams.github.GithubConnectionImpl;
+import es.uniovi.raul.teams.github.GithubApi.*;
+import es.uniovi.raul.teams.github.GithubApiImpl;
 import es.uniovi.raul.teams.organization.Organization;
 import es.uniovi.raul.teams.roster.RosterLoader;
 import es.uniovi.raul.teams.roster.RosterLoader.InvalidRosterFormatException;
@@ -42,7 +42,7 @@ public class Main {
     private static void run(Arguments arguments) throws UnexpectedFormatException,
             RejectedOperationException, IOException, InterruptedException, InvalidRosterFormatException {
 
-        var connection = new GithubConnectionImpl(arguments.token);
+        var connection = new GithubApiImpl(arguments.token);
         var organization = new Organization(arguments.organization, connection);
 
         if (arguments.exclusive.cleanTeams)
