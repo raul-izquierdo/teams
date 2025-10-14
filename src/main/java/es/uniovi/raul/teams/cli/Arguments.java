@@ -24,6 +24,9 @@ public class Arguments {
     @Option(names = "-o", description = "GitHub organization name. If not provided, it will try to read from the GITHUB_ORG environment variable or from a '.env' file.")
     public String organization;
 
+    @Option(names = "--dry-run", description = "Do not perform any changes; only read and print the actions that would be performed.")
+    public boolean dryRun;
+
 }
 
 class Messages {

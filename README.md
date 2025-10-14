@@ -46,7 +46,7 @@ Note that other non-group teams and their members are preserved.
 The JAR can be downloaded from the [releases page](https://github.com/raul-izquierdo/teams/releases).
 
 ```bash
-java -jar teams.jar [<csvfile>] [-o <organization>] [-t <token>] [--clean]
+java -jar teams.jar [<csvfile>] [-o <organization>] [-t <token>] [--clean] [--dry-run]
 ```
 
 | Option              | Description                                                                                                                            |
@@ -55,6 +55,7 @@ java -jar teams.jar [<csvfile>] [-o <organization>] [-t <token>] [--clean]
 | `-o <organization>` | GitHub organization that contains the solutions                                                                                                              |
 | `-t <token>`        | GitHub API access token. See [Obtaining the GitHub Token](https://github.com/raul-izquierdo/classroom-tools#obtaining-the-github-token).                                                                                                               |
 | `--clean`           | Remove all group teams from the organization (useful for a new academic semester).                                                     |
+| `--dry-run`          | Preview the actions that would be performed without making any changes in GitHub.                                                     |
 
 If `-o` or `-t` are not provided, the app tries to read the `GITHUB_ORG` and `GITHUB_TOKEN` variables from a `.env` file in the working directory:
 ```dotenv
