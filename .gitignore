@@ -1,6 +1,6 @@
 # Project specific files
 
-classroom_roster.csv
+*.csv
 
 # Visual Studio Code
 
