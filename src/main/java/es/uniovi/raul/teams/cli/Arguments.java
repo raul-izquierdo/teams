@@ -4,7 +4,7 @@ import picocli.CommandLine.*;
 
 // CHECKSTYLE:OFF
 
-@Command(name = "teams", version = "2.3.0", showDefaultValues = true, mixinStandardHelpOptions = true, usageHelpAutoWidth = true, description = Messages.DESCRIPTION, footer = Messages.CREDITS)
+@Command(name = "teams", showDefaultValues = true, mixinStandardHelpOptions = true, usageHelpAutoWidth = true, description = Messages.DESCRIPTION, footer = Messages.CREDITS, versionProvider = PomVersionReader.class)
 public class Arguments {
 
     @ArgGroup(exclusive = true) // multiplicity = "1" means exactly one required
@@ -41,5 +41,10 @@ class Messages {
             Escuela de Ingeniería Informática, Universidad de Oviedo.
             Raúl Izquierdo Castanedo (raul@uniovi.es)
             """;
+}
 
+class PomVersionReader implements IVersionProvider {
+    public String[] getVersion() throws Exception {
+        return new String[] { Arguments.class.getPackage().getImplementationVersion() };
+    }
 }
