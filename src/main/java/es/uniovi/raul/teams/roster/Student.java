@@ -1,7 +1,14 @@
 package es.uniovi.raul.teams.roster;
 
 /**
- * Represents a student with a student ID and GitHub username.
+ * Stores the information of a student.
+ *
+ * Example:
+ * new Student("Smith, John", "01", "12345", "john-smith72")
+ * - name: "Smith, John"
+ * - group: "01"
+ * - rosterId: "Smith, John (01)"
+ * - login: "john-smith72"
  *
  * @param name            The name of the student
  * @param group           The group of the student
