@@ -1,9 +1,14 @@
 package es.uniovi.raul.teams.roster;
 
 /**
- * Implements a naming strategy where the roster ID is formatted as "name (group)".
+ * Methods to extract the student's name and group from a roster ID, which is in the format "student name (group)".
+ *
+ * Examples roster IDs and their components:
+ * "John Doe (01)" ->  ("John Doe", "01")
+ * "Izquierdo Castanedo, Raúl (i02)" -> ("Izquierdo Castanedo, Raúl", "i02")
+ *
+ * There is no need for a proper Strategy pattern. This strategy is not expected to change, and if it does, it will likely be a complete overhaul rather than a small modification.
  */
-// There is no need for a proper Strategy pattern
 
 public final class RosterNaming {
 
@@ -11,24 +16,12 @@ public final class RosterNaming {
     private static final String CLOSE = ")";
 
     /**
-     * Generates a roster ID based on the student's name and group.
-     * Examples:
-     * "John Doe", "A" -> "John Doe (A)"
-     * "Izquierdo Castanedo, Raúl", "i02" -> "Izquierdo Castanedo, Raúl (i02)"
+     * Extracts the student's name from a given roster ID.
+     * "John Doe (01)" -> "John Doe"
      *
-     * @param name  The student's name
-     * @param group The student's group
-     * @return A string representing the roster ID in the format "name (group)"
+     * @param rosterId The roster ID in the format "name (group)"
+     * @return The student's name extracted from the roster ID
      */
-    public static String generateRosterId(String name, String group) {
-        if (name == null || name.isBlank())
-            throw new IllegalArgumentException("Name must not be null or empty");
-        if (group == null || group.isBlank())
-            throw new IllegalArgumentException("Group must not be null or empty");
-
-        return name + OPEN + group + CLOSE;
-    }
-
     public static String extractStudentName(String rosterId) {
         checkRosterIdStructure(rosterId);
 
@@ -36,6 +29,10 @@ public final class RosterNaming {
         return rosterId.substring(0, openIdx);
     }
 
+    /**
+     * Extracts the student's group from a given roster ID.
+     * "John Doe (01)" -> "01"
+     */
     public static String extractGroup(String rosterId) {
         checkRosterIdStructure(rosterId);
 
@@ -44,7 +41,18 @@ public final class RosterNaming {
         return rosterId.substring(openIdx + OPEN.length(), closeIdx);
     }
 
-    public static boolean isValidRosterId(String rosterId) {
+    //# ------------------------------------------------------------------
+    //# Auxiliary methods
+    //# ------------------------------------------------------------------
+
+    // Auxiliary method to ensure that the roster ID has the correct structure "student-name (group)"
+    private static void checkRosterIdStructure(String rosterId) {
+        if (!isValidRosterId(rosterId))
+            throw new IllegalArgumentException(
+                    "Invalid roster ID '" + rosterId + "'. Expected format: 'student name (group)'");
+    }
+
+    private static boolean isValidRosterId(String rosterId) {
         int openIdx = rosterId.lastIndexOf(OPEN);
         int closeIdx = rosterId.lastIndexOf(CLOSE);
 
@@ -59,12 +67,5 @@ public final class RosterNaming {
             return false;
 
         return true;
-    }
-
-    private static void checkRosterIdStructure(String rosterId) {
-        if (!isValidRosterId(rosterId))
-            throw new IllegalArgumentException(
-                    "Invalid roster ID '" + rosterId + "'. Expected format: 'student name (group)'");
-
     }
 }
