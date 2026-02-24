@@ -9,9 +9,22 @@ import org.apache.commons.csv.*;
 
 /**
  * The Roster is the list of students in a GH Classroom that can be downloaded in CSV format from the classroom.
+ *
+ * The format of the CSV file is expected to be exactly this one (no more, no less columns, and with these exact headers):
+ * "identifier","github_username","github_id","name"
+ *
+ * The fileds are as follows:
+ * - The "identifier" column contains the roster ID, which is in the format "student name (group)". For example: "John Doe (01)" or "Izquierdo Castanedo, Raúl (i02)".
+ * - The "github_username" column contains the student's GitHub username, which is used to link the student to their GitHub account and repositories.
+ * - The "github_id" and "name" columns are ignored by this loader.
  */
 public final class RosterLoader {
 
+    /**
+     * Loads the roster from a CSV file path.
+     *
+     * This method is a shortcut to {@link #load(Reader)}
+     */
     public static List<Student> load(String rosterFile)
             throws IOException, InvalidRosterFormatException {
 
@@ -25,6 +38,11 @@ public final class RosterLoader {
         }
     }
 
+    /**
+     * Loads the roster from a CSV file reader.
+     *
+     * Only students with a non-blank GitHub username are included in the roster. Records without a GitHub username are skipped.
+     */
     public static List<Student> load(Reader reader)
             throws IOException, InvalidRosterFormatException {
 
