@@ -77,6 +77,7 @@ public final class Organization {
 
         var groupTeams = getGroupTeams();
         if (groupTeams.isEmpty()) {
+            logger.log("No group teams found in the organization.");
             return;
         }
 
