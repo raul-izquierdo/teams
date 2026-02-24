@@ -4,7 +4,7 @@ import static es.uniovi.raul.teams.organization.TeamNaming.*;
 import static java.lang.String.*;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 import es.uniovi.raul.teams.github.GithubApi;
 import es.uniovi.raul.teams.github.GithubApi.*;
@@ -46,21 +46,21 @@ public final class Organization {
      *   <li>Updates the membership of each team so that it matches the students assigned to each group.</li>
      * </ul>
      *
-     * @param students the list of students whose group assignments should be reflected in the organization
+     * @param requiredStudents the list of students whose group assignments should be reflected in the organization
      * @throws IOException if a network or I/O error occurs
      * @throws RejectedOperationException if an operation is rejected by the GitHub API
      * @throws UnexpectedFormatException if the data format from the GitHub API is unexpected
      * @throws InterruptedException if the operation is interrupted
      */
-    public void updateWith(List<Student> students)
+    public void updateWith(List<Student> requiredStudents)
             throws GithubApiException, IOException, InterruptedException {
 
-        updateTeams(students.stream()
+        updateTeams(requiredStudents.stream()
                 .map(Student::group)
                 .distinct()
                 .toList());
 
-        updateTeamsMembers(students);
+        updateAllMemberships(requiredStudents);
     }
 
     /**
@@ -74,13 +74,14 @@ public final class Organization {
      */
     public void deleteGroupTeams()
             throws GithubApiException, IOException, InterruptedException {
+
         var groupTeams = getGroupTeams();
-        if (groupTeams.isEmpty())
+        if (groupTeams.isEmpty()) {
             return;
+        }
 
-        // Collect all usernames that belong to any group team (members and pending invitations)
-        var usernamesToRemove = new java.util.HashSet<String>();
-
+        // Collect all usernames that must be removed from the organization: members and pending invitations
+        var usernamesToRemove = new HashSet<String>();
         for (var team : groupTeams) {
             var members = githubApi.getTeamMembers(organizationName, team.slug());
             usernamesToRemove.addAll(members);
@@ -89,7 +90,7 @@ public final class Organization {
             usernamesToRemove.addAll(invites);
         }
 
-        // Remove users from the organization (idempotent if already not members)
+        // Remove users from the organization
         for (var login : usernamesToRemove) {
             try {
                 githubApi.removeMemberFromOrganization(organizationName, login);
@@ -108,13 +109,17 @@ public final class Organization {
         }
     }
 
+    //# ------------------------------------------------------------------
+    //# Auxiliary methods
+    //# ------------------------------------------------------------------
+
     /**
-     * Makes sure that the teams in the organization match the groups in the class.
-     * This method will create new teams for groups that do not have a team yet,
-     * and remove teams that are no longer needed.
-     *
-     * Only teams that correspond to groups teams (follow the naming convention) will be removed.
-     */
+    * Makes sure that the teams in the organization match the groups in the class.
+    * This method will create new teams for groups that do not have a team yet,
+    * and remove teams that are no longer needed.
+    *
+    * Only teams that correspond to groups teams (follow the naming convention) will be removed.
+    */
     private void updateTeams(List<String> requiredGroups)
             throws GithubApiException, IOException, InterruptedException {
 
@@ -124,53 +129,65 @@ public final class Organization {
     }
 
     /**
-     * Updates the members of each team based on the provided list of students.
-     */
-    private void updateTeamsMembers(List<Student> students)
+    * Updates the members of each team based on the provided list of students.
+    */
+    private void updateAllMemberships(List<Student> requiredStudents)
             throws GithubApiException, IOException, InterruptedException {
 
         for (var team : getGroupTeams()) {
-
-            var studentsInTeam = students.stream()
+            var requiredStudentsInTeam = requiredStudents.stream()
                     .filter(student -> student.group().equals(team.group()))
                     .toList();
 
-            updateTeamMembers(team, studentsInTeam);
+            updateTeamMemberships(team, requiredStudentsInTeam);
         }
 
     }
 
-    private void updateTeamMembers(GroupTeam team, List<Student> students)
+    private void updateTeamMemberships(GroupTeam team, List<Student> requiredStudents)
             throws GithubApiException, IOException, InterruptedException {
 
-        List<String> alreadyInvited = githubApi.getTeamMembers(organizationName, team.slug());
-        alreadyInvited.addAll(githubApi.getTeamInvitations(organizationName, team.slug()));
+        List<String> membersOrInvited = githubApi.getTeamMembers(organizationName, team.slug());
+        membersOrInvited.addAll(githubApi.getTeamInvitations(organizationName, team.slug()));
 
-        for (var student : students)
-            if (!alreadyInvited.contains(student.login())) {
+        // Invite missing members
+        for (var student : requiredStudents) {
+            if (!membersOrInvited.contains(student.login())) {
                 githubApi.inviteStudentToTeam(organizationName, team.slug(), student.login());
                 logger.log(format("[Invited student] '%s' to team '%s'", student.name(), team.displayName()));
             }
+        }
 
         // Remove extra members
-        List<String> studentsLogin = students.stream().map(Student::login).toList();
-        for (String existingLogin : alreadyInvited)
-            if (!studentsLogin.contains(existingLogin)) {
+        List<String> requiredStudentsLogins = requiredStudents.stream().map(Student::login).toList();
+        for (String existingStudentLogin : membersOrInvited)
+            if (!requiredStudentsLogins.contains(existingStudentLogin)) {
                 try {
-                    githubApi.removeStudentFromTeam(organizationName, team.slug(), existingLogin);
-                    logger.log(format("[Removed student] '%s' from team '%s'", existingLogin, team.displayName()));
+                    githubApi.removeStudentFromTeam(organizationName, team.slug(), existingStudentLogin);
+                    logger.log(
+                            format("[Removed student] '%s' from team '%s'", existingStudentLogin, team.displayName()));
                 } catch (RejectedOperationException e) {
                     logger.log(format("[WARNING] Could not remove '%s' from team '%s': %s",
-                            existingLogin, team.displayName(), e.getMessage()));
+                            existingStudentLogin, team.displayName(), e.getMessage()));
                     // Continue with next member
                 }
             }
     }
 
-    private void lookForNewTeams(List<String> groups, List<GroupTeam> existingTeams)
+    // Only return the teams in the organization that correspond to students groups
+    private List<GroupTeam> getGroupTeams()
             throws GithubApiException, IOException, InterruptedException {
 
-        List<String> teamsToCreate = groups.stream()
+        return githubApi.getTeams(organizationName).stream()
+                .filter(team -> isGroupTeam(team.displayName()))
+                .map(team -> new GroupTeam(team.displayName(), team.slug(), toGroup(team.displayName())))
+                .toList();
+    }
+
+    private void lookForNewTeams(List<String> requiredGroups, List<GroupTeam> existingTeams)
+            throws GithubApiException, IOException, InterruptedException {
+
+        List<String> teamsToCreate = requiredGroups.stream()
                 .map(TeamNaming::toTeam)
                 .filter(teamName -> existingTeams.stream()
                         .noneMatch(existingTeam -> existingTeam.displayName().equals(teamName)))
@@ -182,11 +199,11 @@ public final class Organization {
         }
     }
 
-    private void lookForTeamsToRemove(List<String> groups, List<GroupTeam> existingTeams)
+    private void lookForTeamsToRemove(List<String> requiredGroups, List<GroupTeam> existingTeams)
             throws GithubApiException, IOException, InterruptedException {
 
         List<GroupTeam> teamsToRemove = existingTeams.stream()
-                .filter(team -> groups.stream().noneMatch(team::isAssociatedWith))
+                .filter(team -> requiredGroups.stream().noneMatch(team::isSameGroup))
                 .toList();
 
         for (var team : teamsToRemove) {
@@ -195,20 +212,19 @@ public final class Organization {
         }
     }
 
-    // Only return the teams that correspond to groups
-    private List<GroupTeam> getGroupTeams()
-            throws GithubApiException, IOException, InterruptedException {
-
-        return githubApi.getTeams(organizationName).stream()
-                .filter(team -> isGroupTeam(team.displayName()))
-                .map(team -> new GroupTeam(team.displayName(), team.slug(), toGroup(team.displayName())))
-                .toList();
-    }
 }
 
+/**
+ * Auxiliary record to represent teams that correspond to student groups.
+ *
+ * Includes:
+ * - displayName: the display name of the team in GitHub (e.g., "group 01")
+ * - slug: the unique identifier of the team in GitHub
+ * - group: the group name extracted from the team name (e.g., "01")
+ */
 record GroupTeam(String displayName, String slug, String group) {
 
-    boolean isAssociatedWith(String otherGroup) {
+    boolean isSameGroup(String otherGroup) {
         return this.group.equals(otherGroup);
     }
 }
