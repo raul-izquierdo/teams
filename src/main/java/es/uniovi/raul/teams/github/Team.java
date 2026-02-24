@@ -1,8 +1,9 @@
 package es.uniovi.raul.teams.github;
 
 /**
- * Represents a team in the system.
- * Each team has a display name, a slug (unique identifier)
+ * Store for the information of a team in a GitHub organization.
+ *
+ * Each team has a display name and a slug (unique identifier used in GitHub API calls).
  *
  * @param displayName the display name of the team
  * @param slug the unique identifier (slug) of the team
